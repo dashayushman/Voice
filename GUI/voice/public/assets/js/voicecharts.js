@@ -14,7 +14,8 @@ function showToast(txtheading,txtmessage,colorcode){
 	    text: txtmessage,
 	    icon: 'info',
 	    loader: true,        // Change it to false to disable loader
-	    loaderBg: colorcode  // To change the background 
+	    loaderBg: '#9EC600',
+	    bgColor: colorcode
 	});
 }
 
@@ -22,7 +23,7 @@ $( "#btnPlay" ).on( "click", function() {
 	if(playing == 0){
 		playing = 1;
 
-		showToast("Record", "Started recording data. You can pause data capture anytime by clicking the pause button and resume again by clicking Play.",'#9EC600');
+		showToast("Record", "Started recording data. You can pause data capture anytime by clicking the pause button and resume again by clicking Play.",'#0D638F');
 		$( this ).css( "color", "green" );
 		$( "#btnPause").css( "color", "" );
 	}
@@ -32,7 +33,7 @@ $( "#btnPlay" ).on( "click", function() {
 $( "#btnPause" ).on( "click", function() {
 	if(playing == 1){
 		playing = 0;
-		showToast("Pause", "Paused data capture. You can play again to resume data capture.",'#9EC600');
+		showToast("Pause", "Paused data capture. You can play again to resume data capture.",'#0D638F');
 		$( this ).css( "color", "green" );
 		$( "#btnPlay").css( "color", "" );
 	}
@@ -41,36 +42,22 @@ $( "#btnPause" ).on( "click", function() {
 
 $( "#btnUndo" ).on( "click", function() {
 		playing = 0;
-		showToast("Undo", "Cleared Data from buffer. You can start recording again by clicking play.",'#9EC600');
+		showToast("Undo", "Cleared Data from buffer. You can start recording again by clicking play.",'#0D638F');
 		$( "#btnPause").css( "color", "" );
 		$( "#btnPlay" ).css( "color", "" );
 		clearBufferdata();
 });
 
 $( "#btnSave" ).on( "click", function() {
-	var expname = $( "#txtExpName").value();
+	var expname = $( "#txtExpName").value;
 	if(playing == 1){
-		showToast("Warning", "Please stop recording before saving your data.",'#ff2e2e');
+		showToast("Warning", "Please stop recording before saving your data.",'#FF2E2E');
 	}else if(expname == null || expname == ""){
-		showToast("Warning", "Please provide an Experiment Name.",'#ff2e2e');
+		showToast("Warning", "Please provide an Experiment Name.",'#FF2E2E');
+	}else if(emgArr.size == 0){
+		showToast("Warning", "Please record some data before saving your experiment.",'#FF2E2E');
 	}else{
-		var serObj = new Object();
-		serObj.emg = {
-			data:emgArr,
-			timestamps:emgTimestampArr
-		};
-		serObj.gyr = {
-			data:gyrArr,
-			timestamps:gyrTimestampArr
-		};
-		serObj.ori = {
-			data:oriArr,
-			timestamps:oriTimestampArr
-		};
-		serObj.acc = {
-			data:accArr,
-			timestamps:accTimestampArr
-		};
+		serielizeBufferData(expname);
+		uploadBufferData();
 	}
-  	
 });

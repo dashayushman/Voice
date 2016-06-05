@@ -17,6 +17,8 @@ Myo.on('connected', function(){
 
 Myo.connect('com.myojs.emgGraphs');
 
+var SerielizedBufferData;
+
 var arm = '';
 
 var emgArr = [];
@@ -245,22 +247,43 @@ function recordArm(){
 	arm = Myo.arm;
 }
 
-function serielizeBufferData(){
-	var serObj = new Object();
-		serObj.emg = {
+function serielizeBufferData(expname){
+	SerielizedBufferData = new Object();
+		SerielizedBufferData.arm = arm;
+		SerielizedBufferData.expName= expname;
+		SerielizedBufferData.emg = {
 			data:emgArr,
 			timestamps:emgTimestampArr
 		};
-		serObj.gyr = {
+		SerielizedBufferData.gyr = {
 			data:gyrArr,
 			timestamps:gyrTimestampArr
 		};
-		serObj.ori = {
+		SerielizedBufferData.ori = {
 			data:oriArr,
 			timestamps:oriTimestampArr
 		};
-		serObj.acc = {
+		SerielizedBufferData.acc = {
 			data:accArr,
 			timestamps:accTimestampArr
 		};
+}
+
+function uploadBufferData(){
+	$.ajax({
+			type : "POST",
+			async : true,
+			url : "uploadData",
+			data: JSON.stringify(SerielizedBufferData)
+		})
+		.done(function(msg) {
+			if(msg.status == 1){
+				showToast("Success", "Successfully uploaded data. You can start a new experiment or start annotating or visualising your data.",'#0D638F');
+			}else{
+				showToast("Success", "Unable to upload data. Please try after some time.",'#ff2e2e');
+			}
+			
+		}).error(function(msg) {
+			showToast("Error", "Some error occured while uploading data. Please try again later.",'#ff2e2e');
+		});
 }
