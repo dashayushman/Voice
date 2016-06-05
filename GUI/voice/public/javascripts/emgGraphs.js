@@ -6,32 +6,42 @@ Myo.on('connected', function(){
 	this.streamEMG(true);
 
 	setInterval(function(){
-		updateGraph(rawData);
+		updateEmgGraph(rawEmgData);
+	}, 25)
+
+	setInterval(function(){
+		updateGyroGraph(rawEmgData);
 	}, 25)
 })
 
 Myo.connect('com.myojs.emgGraphs');
 
 
-var rawData = [0,0,0,0,0,0,0,0];
+var rawEmgData = [0,0,0,0,0,0,0,0];
+var rawGyroData = [0,0,0,0];
+
 Myo.on('emg', function(data){
-	rawData = data;
+	rawEmgData = data;
 })
 
+Myo.on('gyroscope', function(quant){
+	rawGyroData = quant;
+	//updateGyroGraph(quant);
+})
 
-var range = 150;
-var resolution = 50;
+var emgrange = 150;
+var emgresolution = 50;
 var emgGraphs;
 
 var graphData= [
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0),
-	Array.apply(null, Array(resolution)).map(Number.prototype.valueOf,0)
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0),
+	Array.apply(null, Array(emgresolution)).map(Number.prototype.valueOf,0)
 ]
 
 $(document).ready(function(){
@@ -42,11 +52,11 @@ $(document).ready(function(){
 			xaxis: {
 				show: false,
 				min : 0,
-				max : resolution
+				max : emgresolution
 			},
 			yaxis : {
-				min : -range,
-				max : range,
+				min : -emgrange,
+				max : emgrange,
 			},
 			grid : {
 				borderColor : "#427F78",
@@ -65,7 +75,7 @@ var formatFlotData = function(data){
 }
 
 
-var updateGraph = function(emgData){
+var updateEmgGraph = function(emgData){
 
 	graphData.map(function(data, index){
 		graphData[index] = graphData[index].slice(1);
