@@ -252,8 +252,7 @@ body.modal-open .chat-window-wrapper {
   display: inline-block;
   margin-top: 5px;
   margin: 0;
-  font-size: 14px;
-  color: #656565 !important;
+  font-size: 22.5px;
 }
 .header .nav > li.quicklinks > a {
   padding: 4px 2px !important;
