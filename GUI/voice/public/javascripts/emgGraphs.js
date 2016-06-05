@@ -278,12 +278,27 @@ function uploadBufferData(){
 		})
 		.done(function(msg) {
 			if(msg.status == 1){
+				clearBufferdata();
+				$( "#txtExpName").val("");
+				removeLoader("spnLoader")
 				showToast("Success", "Successfully uploaded data. You can start a new experiment or start annotating or visualising your data.",'#0D638F');
+				$( "#btnPlay").css( "color", "" );
+				$( "#btnPause").css( "color", "" );
 			}else{
+				clearBufferdata();
+				$( "#txtExpName").val("");
+				removeLoader("spnLoader")
 				showToast("Success", "Unable to upload data. Please try after some time.",'#ff2e2e');
+				$( "#btnPlay").css( "color", "" );
+				$( "#btnPause").css( "color", "" );
 			}
 			
 		}).error(function(msg) {
+			clearBufferdata();
+			$( "#txtExpName").val("");
+			removeLoader("spnLoader")
 			showToast("Error", "Some error occured while uploading data. Please try again later.",'#ff2e2e');
+			$( "#btnPlay").css( "color", "" );
+			$( "#btnPause").css( "color", "" );
 		});
 }
