@@ -38,6 +38,15 @@ var rawGyroData = [0,0,0];
 var rawAccData = [0,0,0];
 var rawOriData = [0,0,0,0];
 
+function clone(obj) {
+    if (null == obj || "object" != typeof obj) return obj;
+    var copy = obj.constructor();
+    for (var attr in obj) {
+        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+    }
+    return copy;
+}
+
 Myo.on('emg', function(data,timestamp){
 	rawEmgData = data;
 	if(playing == 1){
@@ -50,10 +59,10 @@ Myo.on('gyroscope', function(quant,timestamp){
 	rawGyroData[0] = quant.x;
 	rawGyroData[1] = quant.y;
 	rawGyroData[2] = quant.z;
-
+	var temparr = clone(rawGyroData);
 	if(playing == 1){
 		//console.log(rawGyroData);
-		gyrArr.push(rawGyroData);
+		gyrArr.push(temparr);
 		gyrTimestampArr.push(timestamp);
 	}
 });
@@ -63,9 +72,9 @@ Myo.on('accelerometer', function(data,timestamp){
    	rawAccData[0] = data.x;
 	rawAccData[1] = data.y;
 	rawAccData[2] = data.z;
-
+	var temparr = clone(rawAccData);
 	if(playing == 1){
-		accArr.push(rawAccData);
+		accArr.push(temparr);
 		accTimestampArr.push(timestamp);
 	}
 });
@@ -75,9 +84,9 @@ Myo.on('orientation', function(data,timestamp){
 	rawOriData[1] = data.y;
 	rawOriData[2] = data.z;
 	rawOriData[3] = data.w;
-
+	var temparr = clone(rawOriData);
 	if(playing == 1){
-		oriArr.push(rawOriData);
+		oriArr.push(temparr);
 		oriTimestampArr.push(timestamp);
 	}
 });
@@ -141,7 +150,7 @@ $(document).ready(function(){
 
 	gyrGraphs = gyrgraphData.map(function(gyrData, gyrIndex){
 		return $('#gyr' + gyrIndex).plot(formatGyrFlotData(gyrData), {
-		colors: [ '#04fbec'],
+		colors: [ '#04fffc'],
 		xaxis: {
 			show: false,
 			min : 0,
@@ -160,7 +169,7 @@ $(document).ready(function(){
 
 	accGraphs = accgraphData.map(function(accData, accIndex){
 		return $('#acc' + accIndex).plot(formatAccFlotData(accData), {
-		colors: [ '#04fbbc'],
+		colors: [ '#04eebc'],
 		xaxis: {
 			show: false,
 			min : 0,
@@ -272,11 +281,15 @@ function serielizeBufferData(expname){
 }
 
 function uploadBufferData(){
+	var jsonstr = JSON.stringify(SerielizedBufferData);
+	console.log(jsonstr);
 	$.ajax({
 			type : "POST",
 			async : true,
 			url : "uploadData",
+			dataType: "json",
 			data: JSON.stringify(SerielizedBufferData)
+			//data: {data:SerielizedBufferData}
 		})
 		.done(function(msg) {
 			if(msg.status == 1){

@@ -325,7 +325,7 @@ $( "#source" )
 $( "#btnUndo" ).on( "click", function() {
 		showLoader("spnLoader");
 		loadExperiments();
-		showToast("Undo", "Cleared Data from buffer. You can start recording again by clicking play.",'#0D638F');
+		showToast("Reload", "Reloaded experiments successfully. You can select new experiments to visualise.",'#0D638F');
 		
 });
 

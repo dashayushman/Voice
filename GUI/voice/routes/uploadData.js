@@ -6,11 +6,12 @@ var replaceall = require("replaceall");
 
 /* GET users listing. */
 router.post('/', function(req, res, next) {
+	//console.log(req.body.data)
   var data = JSON.stringify(req.body);
   data = data.slice(2,-5);
   data= replaceall('\\"','"',data);
   var jsondata = JSON.parse(data);
-  console.log(jsondata);
+  //console.log(jsondata);
   saveDataToDisk(data,jsondata.expName + ".json");
   res.json({ status: 1 });
 });

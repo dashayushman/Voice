@@ -25,9 +25,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-bodyParser.json({limit: '1000000000mb'});
-bodyParser.raw({limit: '1000000000mb'});
-bodyParser.text({limit: '1000000000mb'});
+app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyParser.raw({limit: '100mb'}));
+app.use(bodyParser.text({limit: '100mb'}));
 
 app.use('/', routes);
 app.use('/users', users);
