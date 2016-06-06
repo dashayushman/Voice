@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var uploadData = require('./routes/uploadData');
+var visualise = require('./routes/visualise');
+var experiments = require('./routes/experiments');
+var experimentdata = require('./routes/experimentdata');
 
 var app = express();
 
@@ -29,7 +32,9 @@ bodyParser.text({limit: '1000mb'});
 app.use('/', routes);
 app.use('/users', users);
 app.use('/uploadData', uploadData);
-
+app.use('/visualise', visualise);
+app.use('/experiments', experiments);
+app.use('/experimentdata', experimentdata);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
