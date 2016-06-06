@@ -2,15 +2,15 @@ var express = require('express');
 var jsonfile = require('jsonfile')
 var router = express.Router();
 var fs = require('fs');
-
+var rootfolder = './experimentdata/';
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	console.log(req.body.fname);
+	var filename = req.query.fname;
+	var fileContent = jsonfile.readFileSync(rootfolder+req.query.fname);
+	fileContent.status = 1;
+	res.json(fileContent);
 });
 
-function readFileNames(dirname, onFileContent, onError) {
-	
- 	return fs.readdirSync(dirname);
-}
+
 
 module.exports = router;

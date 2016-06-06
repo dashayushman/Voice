@@ -10,7 +10,7 @@ router.post('/', function(req, res, next) {
   data = data.slice(2,-5);
   data= replaceall('\\"','"',data);
   var jsondata = JSON.parse(data);
-  //console.log(jsondata);
+  console.log(jsondata);
   saveDataToDisk(data,jsondata.expName + ".json");
   res.json({ status: 1 });
 });

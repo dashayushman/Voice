@@ -52,6 +52,7 @@ Myo.on('gyroscope', function(quant,timestamp){
 	rawGyroData[2] = quant.z;
 
 	if(playing == 1){
+		//console.log(rawGyroData);
 		gyrArr.push(rawGyroData);
 		gyrTimestampArr.push(timestamp);
 	}
@@ -267,6 +268,7 @@ function serielizeBufferData(expname){
 			data:accArr,
 			timestamps:accTimestampArr
 		};
+		console.log(SerielizedBufferData);
 }
 
 function uploadBufferData(){
