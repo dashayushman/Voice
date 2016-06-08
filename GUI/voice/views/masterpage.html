@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<meta charset="utf-8" />
+<title>Voice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta content="" name="description" />
+<meta content="" name="author" />
+    
+<!-- BEGIN PLUGIN CSS -->
+<link href="assets/plugins/pace/pace-theme-flash.css" rel="stylesheet" type="text/css" media="screen"/>
+<link rel="stylesheet" href="assets/plugins/jquery-ricksaw-chart/css/rickshaw.css" type="text/css" media="screen">
+<link rel="stylesheet" href="assets/plugins/jquery-morris-chart/css/morris.css" type="text/css" media="screen">
+<!-- END PLUGIN CSS -->
+<!-- BEGIN CORE CSS FRAMEWORK -->
+<link href="assets/plugins/boostrapv3/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+<link href="assets/plugins/boostrapv3/css/bootstrap-theme.min.css" rel="stylesheet" type="text/css"/>
+<link href="assets/plugins/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="assets/css/animate.min.css" rel="stylesheet" type="text/css"/>
+<link href="assets/plugins/jquery-scrollbar/jquery.scrollbar.css" rel="stylesheet" type="text/css"/>
+
+
+<!-- END CORE CSS FRAMEWORK -->
+<!-- BEGIN CSS TEMPLATE -->
+<link href="assets/css/style.css" rel="stylesheet" type="text/css"/>
+<link href="assets/css/responsive.css" rel="stylesheet" type="text/css"/>
+<link href="assets/css/custom-icon-set.css" rel="stylesheet" type="text/css"/>
+<link href="stylesheets/jquery.toast.min.css" rel="stylesheet" type="text/css"/>
+
+
+<!-- END CSS TEMPLATE -->
+
+</head>
+<!-- END HEAD -->
+
+<!-- BEGIN BODY -->
+<body class="">
+<!-- BEGIN HEADER -->
+<div class="header navbar navbar-inverse "> 
+  <!-- BEGIN TOP NAVIGATION BAR -->
+  <div class="navbar-inner">
+	<div class="header-seperation"> 
+		<ul class="nav pull-left notifcation-center" id="main-menu-toggle-wrapper" style="display:none">	
+		 <li class="dropdown"> <a id="main-menu-toggle" href="#main-menu"  class="" > <div class="iconset top-menu-toggle-white"></div> </a> </li>		 
+		</ul>
+      <!-- BEGIN LOGO -->	
+      <a href="index.html"><img src="assets/img/logo.png" class="logo" alt=""  data-src="assets/img/logo.png" data-src-retina="assets/img/logo2x.png" width="106" height="21" style="height: 31px;width: 111px;"/></a>
+      <!-- END LOGO --> 
+     
+      </div>
+<div class="header-quick-nav">
+      <!-- BEGIN TOP NAVIGATION MENU -->
+      <div class="pull-left">
+        <ul class="nav quick-section">
+          <li class="quicklinks"> <a href="#" class="" id="layout-condensed-toggle">
+            <div class="iconset top-menu-toggle-dark"></div>
+            </a> </li>
+        </ul>
+        <ul class="nav quick-section">
+          <li class="quicklinks"> <a href="#" class="">
+            <div ><i class="fa fa-play-circle fa fa-2x custom-icon-space" id="btnPlay"></i></div>
+            </a> 
+          </li>
+          <li class="quicklinks"> <span class="h-seperate"></span></li>
+          <li class="quicklinks"> <a href="#" class=""  >
+            <div ><i class="fa fa-pause fa fa-2x custom-icon-space" id="btnPause"></i></div>
+            </a>  </li>
+          <li class="quicklinks"> <span class="h-seperate"></span></li>
+          <li class="quicklinks"> <a href="#" class=""  >
+            <div ><i class="fa fa-undo fa fa-2x custom-icon-space" id="btnUndo"></i></div>
+            </a>  </li>
+          <li class="m-r-10 input-prepend inside search-form no-boarder"> <span class="add-on"> <span><i class="fa fa-cloud-upload fa fa-2x custom-icon-space"></i></span></span>
+            <input id="txtExpName" name="" type="text" class="no-boarder " placeholder="Experiment Name" style="width:250px;"></input>
+            <button id="btnSave" type="button" class="btn btn-success btn-cons">Save</button>
+            <span id="spnLoader"></span>
+          </li>
+        </ul>
+        
+      </div>
+      <!-- END TOP NAVIGATION MENU -->
+      <!-- BEGIN CHAT TOGGLER -->
+      <div class="pull-right">
+       
+        <ul class="nav quick-section ">
+          <li class="quicklinks"> <a data-toggle="dropdown" class="dropdown-toggle  pull-right " href="#" id="user-options">
+            <div class="iconset top-settings-dark "></div>
+            </a>
+            <ul class="dropdown-menu  pull-right" role="menu" aria-labelledby="user-options">
+              
+              <li><a href="login.html"><i class="fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a></li>
+            </ul>
+          </li>
+         
+        </ul>
+      </div>
+      <!-- END CHAT TOGGLER -->
+    </div>
+      <!-- END TOP NAVIGATION MENU --> 
+   
+  </div>
+  <!-- END TOP NAVIGATION BAR --> 
+</div>
+<!-- END HEADER -->
+<!-- BEGIN CONTAINER -->
+<div class="page-container row-fluid">
+  <!-- BEGIN SIDEBAR -->
+  <div class="page-sidebar" id="main-menu"> 
+  <!-- BEGIN MINI-PROFILE -->
+   <div class="page-sidebar-wrapper scrollbar-dynamic" id="main-menu-wrapper"> 
+   
+   <!-- BEGIN SIDEBAR MENU -->	
+	
+    <ul>	
+      <li class="start active "> <a href="/"> <i class="icon-custom-home"></i> <span class="title">Dashboard</span> <span class="selected"></span></a> </li>
+	  <li class=""> <a href="/"> <i class="fa fa-pencil-square"></i> <span class="title">Annotate</span></a> </li>      
+	  <li class=""> <a href="visualise"> <i class="icon-custom-chart"></i>  <span class="title">Visualize</span></a></li>   
+	      
+    </ul>
+	
+	<div class="clearfix"></div>
+    <!-- END SIDEBAR MENU --> 
+  </div>
+  </div>
+  <a href="#" class="scrollup">Scroll</a>
+   
+  <!-- END SIDEBAR --> 
