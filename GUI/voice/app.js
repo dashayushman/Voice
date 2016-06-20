@@ -11,6 +11,7 @@ var uploadData = require('./routes/uploadData');
 var visualise = require('./routes/visualise');
 var experiments = require('./routes/experiments');
 var experimentdata = require('./routes/experimentdata');
+var annotate = require('./routes/annotate');
 
 var app = express();
 
@@ -35,6 +36,7 @@ app.use('/uploadData', uploadData);
 app.use('/visualise', visualise);
 app.use('/experiments', experiments);
 app.use('/experimentdata', experimentdata);
+app.use('/annotate', annotate);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
