@@ -1,4 +1,4 @@
-class Model:
+class HmmModel:
     'Common base class for all Models'
     def __init__(self,label, emg, acc, gyr, ori, emg_1=None, emg_2=None, emg_3=None, emg_4=None, emg_5=None, emg_6=None, emg_7=None, emg_8=None ):
 
