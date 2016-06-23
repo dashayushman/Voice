@@ -3,6 +3,7 @@ import json
 import os
 from datasource import TrainingInstance as tri
 import numpy as np
+from utils import feature_extractor as fe
 
 def read_json_file(filepath):
     with open(filepath) as data_file:
@@ -33,19 +34,19 @@ def getTrainingData(rootdir):
             #extract data from the dictionary
 
             #emg
-            emg = np.array(fileData['emg']['data'])
+            emg = fe.max_abs_scaler.fit_transform(np.array(fileData['emg']['data']))
             emgts = np.array(fileData['emg']['timestamps'])
 
             #accelerometer
-            acc = np.array(fileData['acc']['data'])
+            acc = fe.max_abs_scaler.fit_transform(np.array(fileData['acc']['data']))
             accts = np.array(fileData['acc']['timestamps'])
 
             # gyroscope
-            gyr = np.array(fileData['gyr']['data'])
+            gyr = fe.max_abs_scaler.fit_transform(np.array(fileData['gyr']['data']))
             gyrts = np.array(fileData['gyr']['timestamps'])
 
             # orientation
-            ori = np.array(fileData['ori']['data'])
+            ori = fe.max_abs_scaler.fit_transform(np.array(fileData['ori']['data']))
             orits = np.array(fileData['ori']['timestamps'])
 
             #create training instance
