@@ -14,7 +14,7 @@ max_abs_scaler = preprocessing.MaxAbsScaler()
 window_size = 20
 overlap_size = 7
 
-def get_features(data):
+def getFeatures(data):
     #normalize the data
     data = normalize(data)
 
