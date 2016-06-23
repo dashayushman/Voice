@@ -1,16 +1,36 @@
-import json
-import datasource
-from utils import feature_extractor,dataprep
+from datasource import HmmModel as hmmmod
+from hmmlearn.hmm import GaussianHMM
 
-root_dir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Algos\HMM\Training Data\New"
+def generateModels(trainingData,labels):
+    models = {}
+    modelLabels = []
+    for label in labels:
+        if label in trainingData:
+            trs = trainingData.get(label)
 
-def read_json_file(filepath):
-    with open(filepath) as data_file:
-        data = json.load(data_file)
-        return data
+            #emg model
+            emg = trs['emg']
+            emgl = trs['emgl']
+            hmm_emg = GaussianHMM(n_components=10, covariance_type="diag", n_iter=1000).fit(emg,emgl)
 
-if __name__ == '__main__':
-    labels, data, target = dataprep.getTrainingData(root_dir)
-    #mfcc_feat, feature_matrix, cwtmatr, d_wavelet_features = feature_extractor.get_features(emg[:, 0])
-    #print(feature_matrix)
+            # acc model
+            acc = trs['acc']
+            accl = trs['accl']
+            hmm_acc = GaussianHMM(n_components=10, covariance_type="diag", n_iter=1000).fit(acc, accl)
+
+            # gyr model
+            gyr = trs['gyr']
+            gyrl = trs['gyrl']
+            hmm_gyr = GaussianHMM(n_components=10, covariance_type="diag", n_iter=1000).fit(gyr, gyrl)
+
+            # ori model
+            ori = trs['ori']
+            oril = trs['oril']
+            hmm_ori = GaussianHMM(n_components=10, covariance_type="diag", n_iter=1000).fit(ori, oril)
+
+            objModel = hmmmod.HmmModel(label,hmm_emg,hmm_acc,hmm_gyr,hmm_ori)
+            models[label] = objModel
+
+    return models,modelLabels
+    #print(labels)
 

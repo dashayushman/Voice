@@ -119,16 +119,16 @@ def prepareTrainingData(trainingIndexes, target, data):
             emg_t, acc_t, gyr_t, ori_t = ti.getRawData()
 
             trld['emg'] = emg_t
-            trld['emgl'] = np.array([len(emg_t)])
+            trld['emgl'] = [len(emg_t)]
 
             trld['acc'] = acc_t
-            trld['accl'] = np.array([len(acc_t)])
+            trld['accl'] = [len(acc_t)]
 
             trld['gyr'] = gyr_t
-            trld['gyrl'] = np.array([len(gyr_t)])
+            trld['gyrl'] = [len(gyr_t)]
 
             trld['ori'] = ori_t
-            trld['oril'] = np.array([len(ori_t)])
+            trld['oril'] = [len(ori_t)]
 
             trainingDict[key] = trld
 
