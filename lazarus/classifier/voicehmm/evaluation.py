@@ -1,14 +1,28 @@
-from model_generator import generateModels
+from model_generator import generateModels,loadModels,dumpModels
 from utils import dataprep
-from sklearn.cross_validation import StratifiedKFold
+from sklearn.cross_validation import StratifiedKFold,LabelShuffleSplit
 from utils import dataprep as dp
 import numpy as np
 from utils import feature_extractor as fe
+import matplotlib.pyplot as plt
 
 rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Algos\HMM\Training Data\New"
+modelLabels=['0','1','2','3','4','5','6','7','8','9']
 
-def evaluateAccuracy(test,data,target,models,modelLabels):
+def plot_confusion_matrix(cm,labels, title='Confusion matrix', cmap=plt.cm.Blues):
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(10)
+    plt.xticks(tick_marks, labels, rotation=45)
+    plt.yticks(tick_marks, labels)
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+def evaluateAccuracy(test,data,target,models,modelLabels,labelsdict,labels):
     hit = 0
+    conmat = np.zeros((10,10))
     for idx in test:
         ti = data[idx]
         test_label = target[idx]
@@ -28,20 +42,33 @@ def evaluateAccuracy(test,data,target,models,modelLabels):
         maxProbIndex = prob_vector.index(max(prob_vector))
         if test_label == modelLabels[maxProbIndex]:
             hit += 1
+        if test_label in labelsdict and modelLabels[maxProbIndex] in labelsdict:
+            x = labelsdict[test_label]
+            y = labelsdict[modelLabels[maxProbIndex]]
+            conmat[x,y] = conmat[x,y] + 1
     accuracy = hit/len(test)
+    #print(conmat)
+    plt.figure()
+    plot_confusion_matrix(conmat,labels)
+    plt.show()
     return accuracy
 
 if __name__ == "__main__":
-    labels, data, target = dataprep.getTrainingData(rootDir)
-    skf = StratifiedKFold(target, 5)
+    labels, data, target,labelsdict = dataprep.getTrainingData(rootDir)
+    #skf = StratifiedKFold(target, 5)
+    skf = LabelShuffleSplit(target, n_iter=10, test_size=0.3,random_state=0)
     accuracies = []
     for train, test in skf:
         trainingData = dp.prepareTrainingData(train,target,data)
-        models,modelLabels = generateModels(trainingData,labels)
-        acc = evaluateAccuracy(test,data,target,models,modelLabels)
+        models = loadModels('models.pkl')
+        if(models == None):
+            models,modelLabels = generateModels(trainingData,labels)
+            dumpModels('models.pkl',models)
+        acc = evaluateAccuracy(test,data,target,models,modelLabels,labelsdict,labels)
         accuracies.append(acc)
-        #print("%s %s" % (train, test))
+        #print ("%s %s" % (train, test))
         #modelsDict = generateModels()
+
     print(accuracies)
     print('Total Accuracy in Percentage is:',(np.sum(accuracies)/len(accuracies))*100)
 

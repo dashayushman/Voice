@@ -14,9 +14,9 @@ max_abs_scaler = preprocessing.MaxAbsScaler()
 window_size = 20
 overlap_size = 7
 
-def getFeatures(data):
+def getFeatures(data,window=False):
     #normalize the data
-    data = normalize(data)
+    #data = normalize(data)
 
     #extract MFCC features
     mfcc_feat = mfcc(data,200)
@@ -37,8 +37,10 @@ def getFeatures(data):
     '''
 
     #Create overlapping windows
-    ovlp_windows = get_sliding_windows(data)
-
+    if window==False:
+        ovlp_windows = [data]
+    else:
+        ovlp_windows = get_sliding_windows(data)
     #apply hamming window function
     windowed_frames = windowfn(ovlp_windows)
 

@@ -13,6 +13,7 @@ def read_json_file(filepath):
 def getTrainingData(rootdir):
     training_class_dirs = os.walk(rootdir)
     labels = []
+    labelsdict = {}
     labeldirs = []
     target = []
     data = []
@@ -24,6 +25,9 @@ def getTrainingData(rootdir):
             skip = False
             continue
         labeldirs.append((trclass[0],trclass[2]))
+
+    for i,label in enumerate(labels):
+        labelsdict[label] = i
 
     for i,labeldir in enumerate(labeldirs):
         dirPath = labeldir[0]
@@ -52,13 +56,16 @@ def getTrainingData(rootdir):
             #create training instance
             ti = tri.TrainingInstance(labels[i],emg,acc,gyr,ori,emgts,accts,gyrts,orits)
 
+            #split raw data
+            ti.separateRawData()
+
             #append training instance to data list
             data.append(ti)
 
             #append class label to target list
             target.append(labels[i])
 
-    return labels,data,target
+    return labels,data,target,labelsdict
 
 def prepareTrainingData(trainingIndexes, target, data):
     #dictionary that holds all the consolidated training data
@@ -117,6 +124,7 @@ def prepareTrainingData(trainingIndexes, target, data):
 
         else:
             trld = {}
+            #extract others and get features for creating an svm model
             emg_t, acc_t, gyr_t, ori_t = ti.getRawData()
 
             trld['emg'] = emg_t
