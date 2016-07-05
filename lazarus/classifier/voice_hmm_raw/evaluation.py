@@ -1,11 +1,13 @@
-from model_generator import generateLabeledModel,generateModel
+from model_generator import generateModel
 from sklearn.cross_validation import StratifiedKFold,LabelShuffleSplit
 from utils import dataprep as dp
 import numpy as np
-from utils import feature_extractor as fe
 import matplotlib.pyplot as plt
+from tabulate import tabulate
 
 rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Algos\HMM\Training Data\New"
+n_states_l = [3,4]
+n_folds = 5
 
 def plot_confusion_matrix(cm,labels, title='Confusion matrix', cmap=plt.cm.Blues):
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
@@ -25,12 +27,12 @@ def evaluateAccuracy(test,data,target,models,labelsdict,labels):
         ti = data[idx]
         test_label = target[idx]
         prob_vector = []
-        emg_t, acc_t, gyr_t, ori_t = ti.getRawData()
+        con_data = ti.getConsolidatedDataMatrix()
 
         for modelLabel in labels:
             model = models.get(modelLabel)
             m_hmm = model.getModel()
-            p_log,_ = m_hmm.decode(emg_t)
+            p_log,_ = m_hmm.decode(con_data)
             prob_vector.append(p_log)
 
         maxProbIndex = prob_vector.index(max(prob_vector))
@@ -49,20 +51,51 @@ def evaluateAccuracy(test,data,target,models,labelsdict,labels):
 if __name__ == "__main__":
     labels, data, target,labelsdict,avg_len = dp.getTrainingData(rootDir)
     data = dp.resampleTrainingData(data,avg_len)
-    skf = StratifiedKFold(target, 5)
+    skf = StratifiedKFold(target, n_folds)
     #skf = LabelShuffleSplit(target, n_iter=10, test_size=0.3,random_state=0)
-    accuracies = []
+    table = []
+    i = 0
     for train, test in skf:
         trainingData = dp.prepareTrainingDataHmmRaw(train,target,data)
-        model = generateModel(trainingData,labels,3)
-
-        acc = evaluateAccuracy(test,data,target,labels,labelsdict,labels)
-        accuracies.append(acc)
+        models = generateModel(trainingData,labels,n_states_l)
+        l_states = True
+        if type(n_states_l) is list:
+            accuracies = []
+            for model in models:
+                acc = evaluateAccuracy(test, data, target, model, labelsdict, labels)
+                accuracies.append(acc)
+            accuracies.insert(0,i)
+            table.append(accuracies)
+            i += 1
+        else:
+            acc = evaluateAccuracy(test, data, target, models, labelsdict, labels)
+            table.append([i,acc])
         #print ("%s %s" % (train, test))
         #modelsDict = generateModels()
+    print('Classification Results')
+    print('Number of Folds : ',n_folds)
+    table = np.array(table)
+    if type(n_states_l) is list:
+        skip = True
+        avg_accs = ['average']
+        for ind in np.arange(table.shape[1]):
+            if skip:
+                skip = False
+                continue
+            else:
+                state_accs = table[:,ind]
+                avg = np.average(state_accs)
+                avg_accs.append(avg)
+        table = np.append(table,[avg_accs],axis=0)
+        headers = ['fold index'] + ['acc for n_states=' + s for s in n_states_l]
+        print(tabulate(table, headers, tablefmt="fancy_grid"))
+    else:
+        print('Number of states : ', n_folds)
+        avg = np.average(table[:,1])
+        table = np.append(table,[['average',avg]])
+        headers = ['fold index','accuracy']
+        print(tabulate(table, headers, tablefmt="fancy_grid"))
 
-    print(accuracies)
-    print('Total Accuracy in Percentage is:',(np.sum(accuracies)/len(accuracies))*100)
 
 
 

@@ -87,7 +87,7 @@ def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
     for tid in trainingIndexes:
         key = target[tid]
         ti = data[tid]
-        con_data = ti.getConsolidatedDataMatrix()
+        #con_data = ti.getConsolidatedDataMatrix()
         if key in trainingData:
 
             # get data from existing dictionary
@@ -101,11 +101,11 @@ def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
 
             # append
             lbl_data = np.append(lbl_data, con_mat, axis=0)
-            n_data.append(lbl_data.shape[0])
+            n_data.append(con_mat.shape[0])
 
             # replace in the existing dict
             trld['data'] = lbl_data
-            trld['datal'] = lbl_data
+            trld['datal'] = n_data
 
             trainingData[key] = trld
 
@@ -115,7 +115,7 @@ def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
             con_mat = ti.getConsolidatedDataMatrix()
 
             trld['data'] = con_mat
-            trld['datal'] = con_mat.shape[0]
+            trld['datal'] = [con_mat.shape[0]]
 
             trainingData[key] = trld
 
