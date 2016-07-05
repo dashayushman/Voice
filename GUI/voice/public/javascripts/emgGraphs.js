@@ -50,8 +50,11 @@ function clone(obj) {
 Myo.on('emg', function(data,timestamp){
 	rawEmgData = data;
 	if(playing == 1){
-		emgArr.push(data);
-		emgTimestampArr.push(timestamp);
+		
+			emgArr.push(data);
+			emgTimestampArr.push(timestamp);
+		
+		
 	}
 });
 
@@ -62,8 +65,11 @@ Myo.on('gyroscope', function(quant,timestamp){
 	var temparr = clone(rawGyroData);
 	if(playing == 1){
 		//console.log(rawGyroData);
-		gyrArr.push(temparr);
-		gyrTimestampArr.push(timestamp);
+		
+			gyrArr.push(temparr);
+			gyrTimestampArr.push(timestamp);
+		
+		
 	}
 });
 
@@ -74,8 +80,11 @@ Myo.on('accelerometer', function(data,timestamp){
 	rawAccData[2] = data.z;
 	var temparr = clone(rawAccData);
 	if(playing == 1){
-		accArr.push(temparr);
-		accTimestampArr.push(timestamp);
+		
+			accArr.push(temparr);
+			accTimestampArr.push(timestamp);
+		
+		
 	}
 });
 
@@ -86,8 +95,11 @@ Myo.on('orientation', function(data,timestamp){
 	rawOriData[3] = data.w;
 	var temparr = clone(rawOriData);
 	if(playing == 1){
-		oriArr.push(temparr);
-		oriTimestampArr.push(timestamp);
+		
+			oriArr.push(temparr);
+			oriTimestampArr.push(timestamp);
+		
+		
 	}
 });
 

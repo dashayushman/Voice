@@ -11,12 +11,23 @@ import pywt
 #can be done later but the present approach will cause a huge drop in performance
 
 max_abs_scaler = preprocessing.MaxAbsScaler()
+
 window_size = 20
 overlap_size = 7
 
+def meanScale(data):
+    return preprocessing.scale(data)
+
+def absScale(data):
+    nor_data = max_abs_scaler.fit_transform(data)
+    return nor_data
+
+def absScale(data):
+    return preprocessing.scale(data)
+
 def getFeatures(data,window=False):
     #normalize the data
-    #data = normalize(data)
+    #data = absScale(data)
 
     #extract MFCC features
     mfcc_feat = mfcc(data,200)
@@ -260,11 +271,6 @@ def find_peaks(frames):
         peakind = signal.find_peaks_cwt(frame, np.arange(1, 10))
         window_peaks.append(len(peakind))
     return np.array(window_peaks)
-
-
-def normalize(data):
-    nor_data = max_abs_scaler.fit_transform(data)
-    return nor_data
 
 def get_sliding_windows(data):
     ovlp_windows = sigproc.framesig(data,window_size,overlap_size)

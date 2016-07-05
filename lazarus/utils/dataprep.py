@@ -4,6 +4,7 @@ import os
 from datasource import TrainingInstance as tri
 import numpy as np
 from utils import feature_extractor as fe
+from scipy import signal
 
 def read_json_file(filepath):
     with open(filepath) as data_file:
@@ -17,6 +18,7 @@ def getTrainingData(rootdir):
     labeldirs = []
     target = []
     data = []
+    sample_len_vec = []
     skip = True
     for trclass in training_class_dirs:
         #print(trclass)
@@ -56,6 +58,10 @@ def getTrainingData(rootdir):
             #create training instance
             ti = tri.TrainingInstance(labels[i],emg,acc,gyr,ori,emgts,accts,gyrts,orits)
 
+            #add length for resampling later to the sample length vector
+            sample_len_vec.append(emg.shape[0])
+            sample_len_vec.append(acc.shape[0])
+
             #split raw data
             ti.separateRawData()
 
@@ -65,7 +71,57 @@ def getTrainingData(rootdir):
             #append class label to target list
             target.append(labels[i])
 
-    return labels,data,target,labelsdict
+    avg_len = int(np.mean(sample_len_vec))
+    return labels,data,target,labelsdict,avg_len
+
+def resampleTrainingData(data,sample_length):
+    data = np.array([ti.resampleData(sample_length) for ti in data])
+    return data
+
+def resampleData(data,sample_length):
+    data = np.array(signal.resample(data,sample_length))
+    return data
+
+def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
+    trainingData = {}
+    for tid in trainingIndexes:
+        key = target[tid]
+        ti = data[tid]
+        con_data = ti.getConsolidatedDataMatrix()
+        if key in trainingData:
+
+            # get data from existing dictionary
+            trld = trainingData.get(key)
+            lbl_data = trld.get('data')
+            n_data = trld.get('datal')
+            # extract data from the training instance
+
+            #get consolidated data matrix
+            con_mat = ti.getConsolidatedDataMatrix()
+
+            # append
+            lbl_data = np.append(lbl_data, con_mat, axis=0)
+            n_data.append(lbl_data.shape[0])
+
+            # replace in the existing dict
+            trld['data'] = lbl_data
+            trld['datal'] = lbl_data
+
+            trainingData[key] = trld
+
+        else:
+            trld = {}
+            # extract others and get features for creating an svm model
+            con_mat = ti.getConsolidatedDataMatrix()
+
+            trld['data'] = con_mat
+            trld['datal'] = con_mat.shape[0]
+
+            trainingData[key] = trld
+
+    return trainingData
+
+
 
 def prepareTrainingData(trainingIndexes, target, data):
     #dictionary that holds all the consolidated training data
