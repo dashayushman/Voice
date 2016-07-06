@@ -2,20 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="27c90062-37c1-49f9-a0e1-e7ef76ed7259" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_naive_bayes/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_svm/__init__.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_svm/evaluation.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_svm/model_generator.py" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/datasource/constants.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_knn/__init__.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_knn/evaluation.py" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/classifier/voice_knn/model_generator.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classifier/voice_hmm_feature/model_generator.py" afterPath="$PROJECT_DIR$/classifier/voice_hmm_feature/model_generator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classifier/voice_hmm_raw/model_generator.py" afterPath="$PROJECT_DIR$/classifier/voice_hmm_raw/model_generator.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/datasource/TrainingInstance.py" afterPath="$PROJECT_DIR$/datasource/TrainingInstance.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/dataprep.py" afterPath="$PROJECT_DIR$/utils/dataprep.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/feature_extractor.py" afterPath="$PROJECT_DIR$/utils/feature_extractor.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/utils/visualisation.py" afterPath="$PROJECT_DIR$/utils/visualisation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py" afterPath="$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py" afterPath="$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py" />
     </list>
     <ignored path="lazarus.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -43,42 +35,8 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/classifier/voice_hmm_raw/evaluation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="55" column="14" selection-start-line="55" selection-start-column="14" selection-end-line="55" selection-end-column="14" />
-              <folding>
-                <element signature="e#0#41#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="model_generator.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/classifier/voice_hmm_raw/model_generator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.67146283">
-              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="model_generator.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#44#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py">
+      <file leaf-file-name="evaluation.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/classifier/voice_knn/evaluation.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -129,6 +87,8 @@
         <option value="$PROJECT_DIR$/classifier/voice_svm/model_generator.py" />
         <option value="$PROJECT_DIR$/utils/visualisation.py" />
         <option value="$PROJECT_DIR$/classifier/voice_svm/evaluation.py" />
+        <option value="$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py" />
+        <option value="$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py" />
       </list>
     </option>
   </component>
@@ -234,7 +194,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="voice_svm" />
+              <option name="myItemId" value="voice_naive_bayes" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -252,7 +212,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="voice_naive_bayes" />
+              <option name="myItemId" value="voice_knn" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -278,11 +238,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="G:\PROJECTS\Voice\lazarus\classifier\voice_knn" />
       <recent name="G:\PROJECTS\Voice\lazarus\classifier\voice_naive_bayes" />
       <recent name="G:\PROJECTS\Voice\lazarus\classifier\voice_svm" />
       <recent name="G:\PROJECTS\Voice\lazarus\classifier\voice_hmm_feature" />
       <recent name="G:\PROJECTS\Voice\lazarus\Testing" />
-      <recent name="G:\PROJECTS\Voice\lazarus\datasource" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="G:\PROJECTS\Voice\lazarus\classifier\voicehmm" />
@@ -548,7 +508,7 @@
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3291536" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3291536" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38557994" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30250785" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.39655173" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -592,11 +552,6 @@
           <line>74</line>
           <option name="timeStamp" value="136" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="python-line">
-          <url>file://$PROJECT_DIR$/classifier/voice_hmm_raw/model_generator.py</url>
-          <line>17</line>
-          <option name="timeStamp" value="137" />
-        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -605,18 +560,11 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="138" />
+      <option name="time" value="139" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://C:/Anaconda3/Lib/site-packages/numpy/core/numeric.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="524" column="0" selection-start-line="524" selection-start-column="0" selection-end-line="524" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/utils/feature_extractor.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -959,28 +907,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#44#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/classifier/voice_hmm_raw/evaluation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="55" column="14" selection-start-line="55" selection-start-column="14" selection-end-line="55" selection-end-column="14" />
+        <state vertical-scroll-proportion="5.3781514">
+          <caret line="96" column="62" selection-start-line="96" selection-start-column="62" selection-end-line="96" selection-end-column="62" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
@@ -989,8 +919,34 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/classifier/voice_hmm_raw/model_generator.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.67146283">
+        <state vertical-scroll-proportion="0.78431374">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classifier/voice_naive_bayes/model_generator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.3921568">
+          <caret line="35" column="28" selection-start-line="35" selection-start-column="28" selection-end-line="35" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#44#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classifier/voice_naive_bayes/evaluation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="1.2605042">
+          <caret line="39" column="21" selection-start-line="39" selection-start-column="21" selection-end-line="39" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/classifier/voice_knn/evaluation.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
