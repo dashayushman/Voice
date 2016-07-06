@@ -25,21 +25,21 @@ def absScale(data):
 def absScale(data):
     return preprocessing.scale(data)
 
-def getFeatures(data,window=False):
+def getFeatures(data,samplingRate=200,window=False):
     #normalize the data
     #data = absScale(data)
 
     #extract MFCC features
-    mfcc_feat = mfcc(data,200)
+    #mfcc_feat = mfcc(data,samplingRate)
 
     #Continuous wavelet transform
-    widths = np.arange(1, 100)
-    cwtmatr = signal.cwt(data, signal.ricker, widths)
-    cwtmatr = np.transpose(cwtmatr)
+    #widths = np.arange(1, 100)
+    #cwtmatr = signal.cwt(data, signal.ricker, widths)
+    #cwtmatr = np.transpose(cwtmatr)
 
     #discrete wavelet transform
-    cA, cD = pywt.dwt(data, 'haar')
-    d_wavelet_features =  np.transpose(np.array([cA,cD]))
+    #cA, cD = pywt.dwt(data, 'haar')
+    #d_wavelet_features =  np.transpose(np.array([cA,cD]))
 
     '''
     print(wavelet_features)
@@ -65,7 +65,8 @@ def getFeatures(data,window=False):
     feature_matrix = np.array([window_gc,window_zc,window_len,window_rms,window_mean,window_var,window_ssi,window_iemg,window_peaks,window_minima,window_maxima,window_mean_pwr, window_pow_peaks, window_tot_pw, window_pow_var,window_fr_minima,window_fr_maxima])
     feature_matrix = np.transpose(feature_matrix)
 
-    return mfcc_feat,feature_matrix,cwtmatr,d_wavelet_features
+    #think of adding mfcc,other transforms as well if needed
+    return feature_matrix
 
 def get_emg_time_features(frames):
     window_gc = []

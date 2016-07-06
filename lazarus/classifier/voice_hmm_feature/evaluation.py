@@ -27,7 +27,7 @@ def evaluateAccuracy(test,data,target,models,labelsdict,labels):
         ti = data[idx]
         test_label = target[idx]
         prob_vector = []
-        con_data = ti.getConsolidatedDataMatrix()
+        con_data = ti.getConsolidatedFeatureMatrix()
 
         for modelLabel in labels:
             model = models.get(modelLabel)
@@ -50,13 +50,19 @@ def evaluateAccuracy(test,data,target,models,labelsdict,labels):
 
 if __name__ == "__main__":
     labels, data, target,labelsdict,avg_len = dp.getTrainingData(rootDir)
+
+    #resample also calls consolidate data so there is no need to call consolidate raw data again
     data = dp.resampleTrainingData(data,avg_len)
+
+    #extract features and consolidate features into one single matrix
+    data = dp.extractFeatures(data)
+
     skf = StratifiedKFold(target, n_folds)
     #skf = LabelShuffleSplit(target, n_iter=10, test_size=0.3,random_state=0)
     table = []
     i = 1
     for train, test in skf:
-        trainingData = dp.prepareTrainingDataHmmRaw(train,target,data)
+        trainingData = dp.prepareTrainingDataHmmFeatures(train,target,data)
         models = generateModel(trainingData,labels,n_states_l)
         l_states = True
         if type(n_states_l) is list:

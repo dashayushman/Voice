@@ -78,9 +78,49 @@ def resampleTrainingData(data,sample_length):
     data = np.array([ti.resampleData(sample_length) for ti in data])
     return data
 
-def resampleData(data,sample_length):
-    data = np.array(signal.resample(data,sample_length))
+def extractFeatures(data):
+    data = np.array([ti.extractFeatures(True) for ti in data])
     return data
+
+def prepareTrainingDataHmmFeatures(trainingIndexes, target, data):
+    trainingData = {}
+    for tid in trainingIndexes:
+        key = target[tid]
+        ti = data[tid]
+        #con_data = ti.getConsolidatedDataMatrix()
+        if key in trainingData:
+
+            # get data from existing dictionary
+            trld = trainingData.get(key)
+            lbl_data = trld.get('data')
+            n_data = trld.get('datal')
+            # extract data from the training instance
+
+            #get consolidated data matrix
+            con_mat = ti.getConsolidatedFeatureMatrix()
+
+            # append
+            lbl_data = np.append(lbl_data, con_mat, axis=0)
+            n_data.append(con_mat.shape[0])
+
+            # replace in the existing dict
+            trld['data'] = lbl_data
+            trld['datal'] = n_data
+
+            trainingData[key] = trld
+
+        else:
+            trld = {}
+            # extract others and get features for creating an svm model
+            con_mat = ti.getConsolidatedFeatureMatrix()
+
+            trld['data'] = con_mat
+            trld['datal'] = [con_mat.shape[0]]
+
+            trainingData[key] = trld
+
+    return trainingData
+
 
 def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
     trainingData = {}
