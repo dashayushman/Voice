@@ -1,0 +1,1 @@
+#add all static constants from all the classifiers and link them from here

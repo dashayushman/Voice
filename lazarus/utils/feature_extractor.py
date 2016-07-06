@@ -25,7 +25,7 @@ def absScale(data):
 def absScale(data):
     return preprocessing.scale(data)
 
-def getFeatures(data,samplingRate=200,window=False):
+def getFeatures(data,window=False):
     #normalize the data
     #data = absScale(data)
 

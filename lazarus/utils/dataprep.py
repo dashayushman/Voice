@@ -78,9 +78,32 @@ def resampleTrainingData(data,sample_length):
     data = np.array([ti.resampleData(sample_length) for ti in data])
     return data
 
-def extractFeatures(data):
-    data = np.array([ti.extractFeatures(True) for ti in data])
+def extractFeatures(data,window=True):
+    data = np.array([ti.extractFeatures(window) for ti in data])
     return data
+
+def prepareTrainingDataSvm(trainingIndexes,testingIndexes, target, data):
+    train_x = []    #training data
+    train_y = []    #training labels
+
+    test_x = []     #testing data
+    test_y = []     #testing labels
+
+    for tid in trainingIndexes:
+        key = target[tid]
+        ti = data[tid]
+        con_mat = ti.getConsolidatedFeatureMatrix()
+        train_x.append(con_mat)
+        train_y.append(int(key))
+
+    for tid in testingIndexes:
+        key = target[tid]
+        ti = data[tid]
+        con_mat = ti.getConsolidatedFeatureMatrix()
+        test_x.append(con_mat)
+        test_y.append(int(key))
+
+    return np.array(train_x),np.array(train_y),np.array(test_x),np.array(test_y)
 
 def prepareTrainingDataHmmFeatures(trainingIndexes, target, data):
     trainingData = {}

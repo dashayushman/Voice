@@ -50,10 +50,10 @@ class TrainingInstance:
 
     def extractFeatures(self, window):
         if self.splitted == True:
-            self.emgFeatures = np.array([fe.getFeatures(x,200,window) for x in self.emgList])
-            self.accFeatures = np.array([fe.getFeatures(x,200,window) for x in self.accList])
-            self.gyrFeatures = np.array([fe.getFeatures(x,200,window) for x in self.gyrList])
-            self.oriFeatures = np.array([fe.getFeatures(x,200,window) for x in self.oriList])
+            self.emgFeatures = np.array([fe.getFeatures(x,window) for x in self.emgList])
+            self.accFeatures = np.array([fe.getFeatures(x,window) for x in self.accList])
+            self.gyrFeatures = np.array([fe.getFeatures(x,window) for x in self.gyrList])
+            self.oriFeatures = np.array([fe.getFeatures(x,window) for x in self.oriList])
             self.consolidateFeatures()
         return self
 

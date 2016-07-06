@@ -3,10 +3,6 @@ from hmmlearn.hmm import GaussianHMM
 import pickle
 import os
 
-#set these parameters for doing a grid search for svm
-tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4],
-                     'C': [1, 10, 100, 1000]},
-                    {'kernel': ['linear'], 'C': [1, 10, 100, 1000]}]
 
 def generateModel(trainingData,labels,n_states = 3):
 
