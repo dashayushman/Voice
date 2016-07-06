@@ -24,7 +24,7 @@ if __name__ == "__main__":
     i = 1
     for train, test in skf:
         train_x,train_y,test_x,test_y = dp.prepareTrainingDataSvm(train,test,target,data)
-        models = generateModel(train_x,train_y,test_x,test_y)
+        models = generateModel(train_x,train_y,test_x,test_y,algos)
         for model in models:
             clf = model['model']
             clf_rpt = model['clf_rpt']

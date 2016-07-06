@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from tabulate import tabulate
 
 rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Algos\HMM\Training Data\New"
-algos = ['gauss','multi']
+n_neighbours = [1,5,13,17,27]
 n_folds = 5
 
 if __name__ == "__main__":
@@ -24,13 +24,13 @@ if __name__ == "__main__":
     i = 1
     for train, test in skf:
         train_x,train_y,test_x,test_y = dp.prepareTrainingDataSvm(train,test,target,data)
-        models = generateModel(train_x,train_y,test_x,test_y)
+        models = generateModel(train_x,train_y,test_x,test_y,n_neighbours)
         for model in models:
             clf = model['model']
             clf_rpt = model['clf_rpt']
             cm = model['cm']
-            name = model['name']
-            print('for ',name,'classifier')
+            n_n = model['n_neighbours']
+            print('Number of neighbours ',n_n)
             print('For fold : ',i)
             print('Number of training instances = ',train_y.shape[0])
             print('Number of testing instances = ', test_y.shape[0])
@@ -39,9 +39,3 @@ if __name__ == "__main__":
             print('Confusion Matrix')
             print(cm)
         i += 1
-
-
-
-
-
-
