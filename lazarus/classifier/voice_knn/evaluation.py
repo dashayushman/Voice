@@ -5,18 +5,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tabulate import tabulate
 
-rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Algos\HMM\Training Data\New"
-n_neighbours = [1,5,13,17,27]
-n_folds = 5
+rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\New"
+n_neighbours = [1,3]
+n_folds = 10
 
 if __name__ == "__main__":
-    labels, data, target,labelsdict,avg_len = dp.getTrainingData(rootDir)
+    labels, data, target,labelsdict,avg_len,user_map,user_list,data_dict = dp.getTrainingData(rootDir)
 
     #resample also calls consolidate data so there is no need to call consolidate raw data again
     data = dp.resampleTrainingData(data,avg_len)
 
     #extract features and consolidate features into one single matrix
-    data = dp.extractFeatures(data,False)
+    featData = dp.loadObject('featdata.pkl')
+    if featData is None:
+        data = dp.extractFeatures(data,False)
+        dp.dumpObject('featdata.pkl', data)
+    else:
+        data = featData
 
     skf = StratifiedKFold(target, n_folds)
     #skf = LabelShuffleSplit(target, n_iter=10, test_size=0.3,random_state=0)

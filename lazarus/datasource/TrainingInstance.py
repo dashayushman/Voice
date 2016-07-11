@@ -49,6 +49,7 @@ class TrainingInstance:
         return self
 
     def extractFeatures(self, window):
+        print(self.m_label)
         if self.splitted == True:
             self.emgFeatures = np.array([fe.getFeatures(x,window) for x in self.emgList])
             self.accFeatures = np.array([fe.getFeatures(x,window) for x in self.accList])
