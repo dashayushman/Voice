@@ -21,6 +21,7 @@ svm_tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4, 1e-5, 1e-6],
 
 if __name__ == "__main__":
     util.createDir(repDir)
+    '''
     print('Evaluating Various classifiers')
     print()
     print('Evaluating HMM with windowed features')
@@ -42,7 +43,7 @@ if __name__ == "__main__":
                      modelGenerator=m_hmmraw,
                      prnt=False,
                      filewrt=True)
-
+    '''
     print()
     print('Evaluating KNN with global features')
     knn.evaluate(n_folds=5,

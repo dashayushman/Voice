@@ -128,6 +128,20 @@ def extractFeatures(data,scaler = None,window=True,rms=False,f_mfcc=False):
     data = np.array([ti.extractFeatures(window,scaler,rms,f_mfcc) for ti in data])
     return data
 
+def prepareDataPC(target, data):
+    consolidate = zip(target,data)
+    for lbl,d in consolidate:
+
+        con_mat = d.getConsolidatedFeatureMatrix()
+        if train_x is None:
+            train_x = con_mat
+        else:
+            train_x = np.append(train_x,con_mat,axis=0)
+        train_y.append(int(key))
+
+
+    return np.array(train_x),np.array(train_y),np.array(test_x),np.array(test_y)
+
 def prepareTrainingDataSvm(trainingIndexes,testingIndexes, target, data):
     train_x = None    #training data
     train_y = []    #training labels

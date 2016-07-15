@@ -171,3 +171,89 @@ class TrainingInstance:
             return self.emg, self.acc, self.gyr, self.ori,self.emgList,self.accList,self.gyrList,self.oriList
         else:
             return self.emg, self.acc, self.gyr, self.ori
+
+    def getIndevidualFeatures(self):
+        emg_0_feat = None
+        emg_1_feat = None
+        emg_2_feat = None
+        emg_3_feat = None
+        emg_4_feat = None
+        emg_5_feat = None
+        emg_6_feat = None
+        emg_7_feat = None
+
+        acc_x_feat = None
+        acc_y_feat = None
+        acc_z_feat = None
+
+        gyr_x_feat = None
+        gyr_y_feat = None
+        gyr_z_feat = None
+
+        ori_x_feat = None
+        ori_y_feat = None
+        ori_z_feat = None
+        ori_w_feat = None
+
+        if self.splitted and self.consolidatedFeatures:
+            for i,feat in enumerate(self.emgFeatures):
+                if i is 0:
+                    emg_0_feat = feat
+                    emg_0_feat = np.insert(emg_0_feat,len(emg_0_feat[0]),self.m_label)
+                elif i is 1:
+                    emg_1_feat = feat
+                    emg_1_feat = np.insert(emg_1_feat,len(emg_1_feat[0]), self.m_label)
+                elif i is 2:
+                    emg_2_feat = feat
+                    emg_2_feat = np.insert(emg_2_feat, len(emg_2_feat[0]), self.m_label)
+                elif i is 3:
+                    emg_3_feat = feat
+                    emg_3_feat = np.insert(emg_3_feat,len(emg_3_feat[0]), self.m_label)
+                elif i is 4:
+                    emg_4_feat = feat
+                    emg_4_feat = np.insert(emg_4_feat,len(emg_4_feat[0]), self.m_label)
+                elif i is 5:
+                    emg_5_feat = feat
+                    emg_5_feat = np.insert(emg_5_feat,len(emg_5_feat[0]), self.m_label)
+                elif i is 6:
+                    emg_6_feat = feat
+                    emg_6_feat = np.insert(emg_6_feat,len(emg_6_feat[0]), self.m_label)
+                elif i is 7:
+                    emg_7_feat = feat
+                    emg_7_feat = np.insert(emg_7_feat,len(emg_7_feat[0]), self.m_label)
+            for i,feat in enumerate(self.accFeatures):
+                if i is 0:
+                    acc_x_feat = feat
+                    acc_x_feat = np.insert(acc_x_feat,len(acc_x_feat[0]), self.m_label)
+                elif i is 1:
+                    acc_y_feat = feat
+                    acc_y_feat = np.insert(acc_y_feat, len(acc_y_feat[0]), self.m_label)
+                elif i is 2:
+                    acc_z_feat = feat
+                    acc_z_feat = np.insert(acc_z_feat, len(acc_z_feat[0]), self.m_label)
+            for i, feat in enumerate(self.gyrFeatures):
+                if i is 0:
+                    gyr_x_feat = feat
+                    gyr_x_feat = np.insert(gyr_x_feat, len(gyr_x_feat[0]), self.m_label)
+                elif i is 1:
+                    gyr_y_feat = feat
+                    gyr_y_feat = np.insert(gyr_y_feat, len(gyr_y_feat[0]), self.m_label)
+                elif i is 2:
+                    gyr_z_feat = feat
+                    gyr_z_feat = np.insert(gyr_z_feat, len(gyr_z_feat[0]), self.m_label)
+            for i, feat in enumerate(self.oriFeatures):
+                if i is 0:
+                    ori_x_feat = feat
+                    ori_x_feat = np.insert(ori_x_feat, len(ori_x_feat[0]), self.m_label)
+                elif i is 1:
+                    ori_y_feat = feat
+                    ori_y_feat = np.insert(ori_y_feat, len(ori_y_feat[0]), self.m_label)
+                elif i is 2:
+                    ori_z_feat = feat
+                    ori_z_feat = np.insert(ori_z_feat, len(ori_z_feat[0]), self.m_label)
+                elif i is 3:
+                    ori_w_feat = feat
+                    ori_w_feat = np.insert(ori_w_feat, len(ori_w_feat[0]), self.m_label)
+            return emg_0_feat,emg_1_feat,emg_2_feat,emg_3_feat,emg_4_feat,emg_5_feat,emg_6_feat,emg_7_feat,acc_x_feat,acc_y_feat,acc_z_feat,gyr_x_feat,gyr_y_feat,gyr_z_feat,ori_x_feat,ori_y_feat,ori_z_feat,ori_w_feat
+        else:
+            return None

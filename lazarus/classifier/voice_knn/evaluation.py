@@ -23,7 +23,7 @@ def evaluate(n_folds,n_neighbours,rootDir,reportDir,cacheDir,modelGenerator,prnt
     # extract features and consolidate features into one single matrix
     featData = dp.loadObject(os.path.join(cacheDir, 'featdata.pkl'))
     if featData is None:
-        data = dp.extractFeatures(data, None, window=True, rms=False, f_mfcc=True)
+        data = dp.extractFeatures(data, None, window=False, rms=False, f_mfcc=True)
         dp.dumpObject(os.path.join(cacheDir, 'featdata.pkl'), data)
     else:
         data = featData
