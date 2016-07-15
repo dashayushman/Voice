@@ -1,31 +1,21 @@
-from model_generator import generateModel
-from sklearn.cross_validation import StratifiedKFold,LabelShuffleSplit
+from sklearn.cross_validation import StratifiedKFold
 from utils import dataprep as dp
-import numpy as np
-import matplotlib.pyplot as plt
-from tabulate import tabulate
+from utils import utility as util
+from sklearn.metrics import classification_report,accuracy_score,confusion_matrix
+import os
+import time
 
-rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\New"
-n_states_l = [10]
-n_folds = 10
-
-def plot_confusion_matrix(cm,labels, title='Confusion matrix', cmap=plt.cm.Blues):
-    plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
-    tick_marks = np.arange(10)
-    plt.xticks(tick_marks, labels, rotation=45)
-    plt.yticks(tick_marks, labels)
-    plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
+rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual"
+n_states_l = [8]
+n_folds = 5
 
 def evaluateAccuracy(test,data,target,models,labelsdict,labels):
-    hit = 0
-    conmat = np.zeros((10,10))
+    y_true = []
+    y_pred = []
     for idx in test:
         ti = data[idx]
-        test_label = str(target[idx])
+        #test_label = str(target[idx])
+        y_true.append(target[idx])
         prob_vector = []
         con_data = ti.getConsolidatedDataMatrix()
 
@@ -36,69 +26,47 @@ def evaluateAccuracy(test,data,target,models,labelsdict,labels):
             prob_vector.append(p_log)
 
         maxProbIndex = prob_vector.index(max(prob_vector))
-        if test_label == labels[maxProbIndex]:
-            hit += 1
-        if test_label in labelsdict and labels[maxProbIndex] in labelsdict:
-            x = labelsdict[test_label]
-            y = labelsdict[labels[maxProbIndex]]
-            conmat[x,y] = conmat[x,y] + 1
-    accuracy = hit/len(test)
-    #plt.figure()
-    #plot_confusion_matrix(conmat,labels)
-    #plt.show()
-    return accuracy,conmat
+        pred_label = int(labels[maxProbIndex])
+        y_pred.append(pred_label)
+    clf_rpt = classification_report(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred)
+    acc_scr = accuracy_score(y_true, y_pred)
 
-if __name__ == "__main__":
+    return clf_rpt,cm,acc_scr
+
+def evaluate(n_folds,n_states_l,rootDir,reportDir,modelGenerator,prnt=True,filewrt=False):
+    fileContent = []
+    accuracies = []
     labels, data, target,labelsdict,avg_len,user_map,user_list,data_dict = dp.getTrainingData(rootDir)
     data = dp.resampleTrainingData(data,avg_len)
     skf = StratifiedKFold(target, n_folds)
-    #skf = LabelShuffleSplit(target, n_iter=10, test_size=0.3,random_state=0)
-    table = []
-    conmats = []
     i = 1
     for train, test in skf:
         trainingData = dp.prepareTrainingDataHmmRaw(train,target,data)
-        models = generateModel(trainingData,labels,n_states_l)
+        models = modelGenerator.generateModel(trainingData,labels,n_states_l)
         l_states = True
         if type(n_states_l) is list:
-            accuracies = []
-            for model in models:
-                acc,conmat = evaluateAccuracy(test, data, target, model, labelsdict, labels)
-                accuracies.append(acc)
-                conmats.append(conmat)
-            accuracies.insert(0,i)
-            table.append(accuracies)
-            i += 1
+            for j,model in enumerate(models):
+                clf_rpt, cm, acc_scr = evaluateAccuracy(test, data, target, model, labelsdict, labels)
+                fileContent = util.appendClfReportToListHMM(fileContent, clf_rpt, cm, acc_scr, n_states_l[j], i,
+                                                            len(train), len(test),labels)
+                accuracies.append(acc_scr)
         else:
-            acc = evaluateAccuracy(test, data, target, models, labelsdict, labels)
-            table.append([i,acc])
-        #print ("%s %s" % (train, test))
-        #modelsDict = generateModels()
-    print('Classification Results')
-    print('Number of Folds : ',n_folds)
-    table = np.array(table)
-    if type(n_states_l) is list:
-        skip = True
-        avg_accs = ['average']
-        for ind in np.arange(table.shape[1]):
-            if skip:
-                skip = False
-                continue
-            else:
-                state_accs = table[:,ind]
-                avg = np.average(state_accs)
-                avg_accs.append(avg)
-        table = np.append(table,[avg_accs],axis=0)
-        headers = ['fold index'] + ['n_states=' + str(s) for s in n_states_l]
-        print(tabulate(table, headers, tablefmt="simple"))
-    else:
-        print('Number of states : ', n_folds)
-        avg = np.average(table[:,1])
-        table = np.append(table,[['average',avg]])
-        headers = ['fold index','accuracy']
-        print(tabulate(table, headers, tablefmt="fancy_grid"))
-    for conmat in conmats:
-        print(conmat)
+            clf_rpt, cm, acc_scr = evaluateAccuracy(test, data, target, models, labelsdict, labels)
+            fileContent = util.appendClfReportToListHMM(fileContent, clf_rpt, cm, acc_scr, n_states_l[j], i, len(train),
+                                                        len(test),labels)
+
+            accuracies.append(acc_scr)
+        i += 1
+    fileContent = util.appendHeaderToFcListHMM(fileContent, accuracies,'Hidden Markov Model (With Raw Data)')
+
+    str_fc = util.getStrFrmList(fileContent, '')
+    html = util.mrkdwn2html(str_fc)
+    if prnt:
+        print(str_fc)
+    if filewrt:
+        util.writeToFile(os.path.join(reportDir, 'Hmm_Raw_' + str(int(time.time())) + '.html'), html)
+
 
 
 

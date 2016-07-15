@@ -10,7 +10,7 @@ def generateModel(trainingData,labels,n_states = 3):
         for s in n_states:
             models = {}
             for label in labels:
-                print('generating model for label ',label)
+                #print('generating model for label ',label)
                 if int(label) in trainingData:
                     trs = trainingData.get(int(label))
                     data = trs['data']
@@ -18,7 +18,7 @@ def generateModel(trainingData,labels,n_states = 3):
                     hmm_model = GaussianHMM(n_components=s, covariance_type="full", n_iter=1000).fit(data,l_data)
                     objModel = hmmmod.OneHmmModel(hmm_model)
                     models[label] = objModel
-                print('generated model for label ', label)
+                #print('generated model for label ', label)
             model_list.append(models)
         return model_list
     models = {}

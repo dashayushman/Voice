@@ -117,47 +117,6 @@ def getTrainingData(rootdir):
 
                 # append class label to target list
                 target.append(tar_val)
-    '''
-    for i,labeldir in enumerate(labeldirs):
-        dirPath = labeldir[0]
-        filelist = labeldir[1]
-        for file in filelist:
-            fileData = read_json_file(dirPath + os.pathsep +file)
-
-            #extract data from the dictionary
-
-            #emg
-            emg = fe.max_abs_scaler.fit_transform(np.array(fileData['emg']['data']))
-            emgts = np.array(fileData['emg']['timestamps'])
-
-            #accelerometer
-            acc = fe.max_abs_scaler.fit_transform(np.array(fileData['acc']['data']))
-            accts = np.array(fileData['acc']['timestamps'])
-
-            # gyroscope
-            gyr = fe.max_abs_scaler.fit_transform(np.array(fileData['gyr']['data']))
-            gyrts = np.array(fileData['gyr']['timestamps'])
-
-            # orientation
-            ori = fe.max_abs_scaler.fit_transform(np.array(fileData['ori']['data']))
-            orits = np.array(fileData['ori']['timestamps'])
-
-            #create training instance
-            ti = tri.TrainingInstance(labels[i],emg,acc,gyr,ori,emgts,accts,gyrts,orits)
-
-            #add length for resampling later to the sample length vector
-            sample_len_vec.append(emg.shape[0])
-            sample_len_vec.append(acc.shape[0])
-
-            #split raw data
-            ti.separateRawData()
-
-            #append training instance to data list
-            data.append(ti)
-
-            #append class label to target list
-            target.append(labels[i])
-    '''
     avg_len = int(np.mean(sample_len_vec))
     return labels,data,target,labelsdict,avg_len,user_map,user_list,data_dict
 
@@ -165,8 +124,8 @@ def resampleTrainingData(data,sample_length):
     data = np.array([ti.resampleData(sample_length) for ti in data])
     return data
 
-def extractFeatures(data,window=True):
-    data = np.array([ti.extractFeatures(window) for ti in data])
+def extractFeatures(data,scaler = None,window=True,rms=False,f_mfcc=False):
+    data = np.array([ti.extractFeatures(window,scaler,rms,f_mfcc) for ti in data])
     return data
 
 def prepareTrainingDataSvm(trainingIndexes,testingIndexes, target, data):

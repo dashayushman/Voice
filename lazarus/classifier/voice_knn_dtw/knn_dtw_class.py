@@ -74,7 +74,7 @@ class KnnDtw(object):
         # Create cost matrix via broadcasting with large int
         ts_a, ts_b = np.array(ts_a), np.array(ts_b)
         M, N = len(ts_a), len(ts_b)
-        cost = sys.maxint * np.ones((M, N))
+        cost = sys.maxsize * np.ones((M, N))
 
         # Initialize the first row and column
         cost[0, 0] = d(ts_a[0], ts_b[0])

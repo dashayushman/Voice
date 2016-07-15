@@ -12,6 +12,7 @@ import pywt
 
 max_abs_scaler = preprocessing.MaxAbsScaler()
 
+
 window_size = 20
 overlap_size = 7
 
@@ -25,12 +26,11 @@ def absScale(data):
 def absScale(data):
     return preprocessing.scale(data)
 
-def getFeatures(data,window=False):
+def getFeatures(data,samplingRate,window=False,f_mfcc=False):
     #normalize the data
     #data = absScale(data)
 
-    #extract MFCC features
-    #mfcc_feat = mfcc(data,samplingRate)
+
 
     #Continuous wavelet transform
     #widths = np.arange(1, 100)
@@ -46,29 +46,43 @@ def getFeatures(data,window=False):
     plt.imshow(wavelet_features, extent=[-1, 1, 1, 31], cmap='PRGn', aspect='auto', vmax=abs(cwtmatr).max(),vmin=-abs(cwtmatr).max())
     plt.show()
     '''
-
+    windowed_frames = None
     #Create overlapping windows
     if window==False:
         ovlp_windows = [data]
+        windowed_frames = ovlp_windows
     else:
         ovlp_windows = get_sliding_windows(data)
-    #apply hamming window function
-    windowed_frames = windowfn(ovlp_windows)
+        # apply hamming window function
+        windowed_frames = windowfn(ovlp_windows)
 
     # Time domain features
-    window_gc,window_zc,window_len,window_rms,window_mean,window_var,window_ssi,window_iemg,window_peaks,window_auto_coor,window_minima,window_maxima = get_emg_time_features(windowed_frames)
+    window_gc,window_zc,window_len,window_rms,window_mean,window_var,window_ssi,window_iemg,window_peaks,window_auto_coor,window_minima,window_maxima = get_time_features(windowed_frames)
 
     #Frequency domain features
-    window_mean_pwr, window_pow_peaks, window_tot_pw, window_pow_var,window_fr_minima,window_fr_maxima = get_emg_freq_features(windowed_frames, 512)
+    window_mean_pwr, window_pow_peaks, window_tot_pw, window_pow_var,window_fr_minima,window_fr_maxima = get_freq_features(windowed_frames, 512,samplingRate)
 
+    if f_mfcc:
+        frames_mfcc_feat = get_mfcc_features(windowed_frames,178)
     #create feature vector
     feature_matrix = np.array([window_gc,window_zc,window_len,window_rms,window_mean,window_var,window_ssi,window_iemg,window_peaks,window_minima,window_maxima,window_mean_pwr, window_pow_peaks, window_tot_pw, window_pow_var,window_fr_minima,window_fr_maxima])
     feature_matrix = np.transpose(feature_matrix)
+    if f_mfcc:
+        feature_matrix = np.concatenate((feature_matrix, frames_mfcc_feat), axis=1)
 
     #think of adding mfcc,other transforms as well if needed
     return feature_matrix
 
-def get_emg_time_features(frames):
+def get_mfcc_features(frames,sampleRate):
+    frames_mfcc_feat = []
+    for frame in frames:
+        mfcc_feat = mfcc(frame, sampleRate)
+        mfcc_feat = np.ravel(mfcc_feat)
+        print(len(mfcc_feat))
+        frames_mfcc_feat.append(mfcc_feat)
+    return frames_mfcc_feat
+
+def get_time_features(frames):
     window_gc = []
     window_zc = []
     window_len = []
@@ -152,18 +166,25 @@ def get_emg_time_features(frames):
     return np.array(window_gc),np.array(window_zc),np.array(window_len),np.array(window_rms),np.array(window_mean),np.array(window_var),np.array(window_ssi),np.array(window_iemg),np.array(window_peaks),np.array(window_auto_coor),np.array(window_minima),np.array(window_maxima)
 
 
-
 #find mean frequency
 #find power frequency ratio
 #peak frequencies
-def get_emg_freq_features(frames,NFFT):
+def get_freq_features(frames,NFFT,samplingRate):
     window_mean_pwr = []
     window_n_peaks = []
     window_tot_pw = []
     window_pow_var = []
     window_minima = []
     window_maxima = []
+    window_max_fr = []
+    window_min_fr = []
 
+    '''
+    for fr in frames:
+        w = np.fft.fft(fr)
+        freqs = np.fft.fftfreq(len(fr))
+        minima = abs()
+    '''
     frames_pw_spec = sigproc.powspec(frames,NFFT)
     for frame in frames_pw_spec:
         #n_peaks

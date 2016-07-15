@@ -1,9 +1,6 @@
-from sklearn.grid_search import GridSearchCV
-from sklearn.metrics import classification_report
-from sklearn.svm import SVC
+from sklearn.metrics import classification_report,accuracy_score,confusion_matrix
 import pickle
 import os
-from sklearn.metrics import confusion_matrix
 from sklearn.naive_bayes import GaussianNB,MultinomialNB
 
 
@@ -16,10 +13,13 @@ def generateModel(X_train,y_train,X_test,y_test,algos=['gauss']):
             y_true, y_pred = y_test, nb_clf_gaus.predict(X_test)
             clf_rpt = classification_report(y_true, y_pred)
             cm = confusion_matrix(y_test, y_pred)
+            acc_scr = accuracy_score(y_true, y_pred)
             clf = {}
+
             clf['model'] = nb_clf_gaus
             clf['clf_rpt'] = clf_rpt
             clf['cm']=cm
+            clf['as'] = acc_scr
             clf['name'] = 'Gaussian Naive Bayes'
             clfs.append(clf)
         if algo == 'multi':

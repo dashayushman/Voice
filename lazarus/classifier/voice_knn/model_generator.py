@@ -3,7 +3,7 @@ import pickle
 import os
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
-
+from sklearn.metrics import accuracy_score
 
 def generateModel(X_train,y_train,X_test,y_test,n_neighbours=[3]):
     clfs = []
@@ -13,10 +13,12 @@ def generateModel(X_train,y_train,X_test,y_test,n_neighbours=[3]):
         y_true, y_pred = y_test, neigh.predict(X_test)
         clf_rpt = classification_report(y_true, y_pred)
         cm = confusion_matrix(y_test, y_pred)
+        acc_scr = accuracy_score(y_true, y_pred)
         clf = {}
         clf['model'] = neigh
         clf['clf_rpt'] = clf_rpt
         clf['cm']=cm
+        clf['as'] = acc_scr
         clf['n_neighbours'] = n_neighbour
         clfs.append(clf)
     # Note the problem is too easy: the hyperparameter plateau is too flat and the
