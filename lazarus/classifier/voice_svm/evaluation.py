@@ -5,42 +5,59 @@ from utils import utility as util
 import os
 import time
 
-rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual"
-n_folds = 5
+def evaluate(n_folds,tp,rootDir,reportDir,cacheDir,modelGenerator,sampling_rate=50,prnt=True,filewrt=False,cacherefresh=False,scaler = None):
+    fileContent = []    # empty list for storing the classification report data which will be used later for writing to a file
+    accuracies = []     # list of accuracies in every fold of the crossvalidation
 
-scaler = preprocessing.StandardScaler()
+    # extract training data from the root directory of the ground truth
+    labels, data, target,labelsdict,avg_len_emg,avg_len_acc,user_map,user_list,data_dict,max_length_emg,max_length_others,data_path = dp.getTrainingData(rootDir)
 
-tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3,1e-4,1e-5,1e-6],
-                     'C': [1, 10, 100, 1000,10000]},
-                    {'kernel': ['linear'], 'C': [1, 10, 100, 1000,10000]}]
+    #scale the training data
+    print('scaling data')
+    if scaler is not None:
+        data = dp.scaleData(data,scaler) #add a print statement that will indicate which instance is being scaled and how many left. do this for others as well
 
-def evaluate(n_folds,tp,rootDir,reportDir,cacheDir,modelGenerator,prnt=True,filewrt=False,cacherefresh=False):
-    fileContent = []
-    accuracies = []
+    #normalize the training instances to a common length to preserve the sampling to be used later for extracting features
+    print('normalizing data')
+    data = dp.normalizeTrainingData(data,max_length_emg,max_length_others)
 
-    labels, data, target,labelsdict,avg_len,user_map,user_list,data_dict = dp.getTrainingData(rootDir)
+    # resample all the training instances to normalize the data vectors
+    # resample also calls consolidate data so there is no need to call consolidate raw data again
+    print('resample data')
+    data = dp.resampleTrainingData(data,sampling_rate,avg_len_acc,emg=False,imu=True)
 
-    #resample also calls consolidate data so there is no need to call consolidate raw data again
-    data = dp.resampleTrainingData(data,avg_len)
 
     #extract features and consolidate features into one single matrix
     if cacherefresh:
-        os.remove(os.path.join(cacheDir, 'featdata.pkl'))
-    # extract features and consolidate features into one single matrix
-    featData = dp.loadObject(os.path.join(cacheDir, 'featdata.pkl'))
-    if featData is None:
-        data = dp.extractFeatures(data, None, window=False, rms=False, f_mfcc=True)
+        if os.path.isfile(os.path.join(cacheDir, 'featdata.pkl')):
+            os.remove(os.path.join(cacheDir, 'featdata.pkl'))
+        #if featdata.pkl does not exist then extract features and store it again for the future
+        data = dp.extractFeatures(data, None, window=False, rms=False, f_mfcc=True,emg=False,imu=True)
         dp.dumpObject(os.path.join(cacheDir, 'featdata.pkl'), data)
-    else:
+    elif os.path.isfile(os.path.join(cacheDir, 'featdata.pkl')):
+        # load the serielized featdata.pkl file to make things faster
+        featData = dp.loadObject(os.path.join(cacheDir, 'featdata.pkl'))
         data = featData
+    else:
+        data = dp.extractFeatures(data, None, window=False, rms=False, f_mfcc=True, emg=False, imu=True)
+        dp.dumpObject(os.path.join(cacheDir, 'featdata.pkl'), data)
 
+    # Split the training instances into two sets
+    # 1. Training Set
+    # 2. Validation Set
     skf = StratifiedKFold(target, n_folds)
-    #skf = LabelShuffleSplit(target, n_iter=10, test_size=0.3,random_state=0)
     table = []
     i = 1
+
+    # K-Fold Cross validation
     for train, test in skf:
+        #split training instances into training and validation sets. Do not get confused by the name test. Just trying to use scikit-learn nomenclature
         train_x,train_y,test_x,test_y = dp.prepareTrainingDataSvm(train,test,target,data)
+
+        #generate the best model and classification report by doing a grid search over a list of parameters
         model,clf_rpt,cm,acc_scr,best_params = modelGenerator.generateModel(train_x,train_y,test_x,test_y,tp)
+
+        #add classification report to a list for structuring reports to write to a file
         fileContent = util.appendClfReportToListSvm(fileContent,
                                                    clf_rpt,
                                                    cm,
@@ -55,6 +72,8 @@ def evaluate(n_folds,tp,rootDir,reportDir,cacheDir,modelGenerator,prnt=True,file
     fileContent = util.appendHeaderToFcListHMM(fileContent, accuracies, 'SVM')
 
     str_fc = util.getStrFrmList(fileContent, '')
+
+    #convert markdown to html
     html = util.mrkdwn2html(str_fc)
     if prnt:
         print(str_fc)

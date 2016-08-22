@@ -1,4 +1,4 @@
-
+#Import dependencies
 import json
 import os
 from datasource import TrainingInstance as tri
@@ -7,6 +7,18 @@ from utils import feature_extractor as fe
 import pickle
 import random
 
+
+def scaleData(data,scaler):
+    '''
+    Method to scale the sensor data as a preprocessing step
+    :param data: (list) List of all the training instance objects
+    :return: data: (list) List of a ll the scaled training data objects
+    '''
+
+    data = np.array([ti.scaleData(scaler) for ti in data])
+    return data
+
+# Serielize objects to disk for future reuse to make things faster
 def dumpObject(filePath,object):
     try:
         with open(filePath, 'wb') as f:
@@ -14,6 +26,7 @@ def dumpObject(filePath,object):
             return True
     except IOError as e:
         return False
+
 
 def loadObject(filePath):
     if os.path.isfile(filePath):
@@ -28,33 +41,67 @@ def read_json_file(filepath):
         data = json.load(data_file)
         return data
 
-def getTrainingData(rootdir):
-    training_class_dirs = os.walk(rootdir)
-    labels = []
-    labelsdict = {}
-    labeldirs = []
-    target = []
-    data = []
-    sample_len_vec = []
-    data_dict = {}
-    user_map = {}
-    user_list = []
-    user_ids = np.arange(100).tolist()
+# Get training data from the root directory where the ground truth exists
 
+def getTrainingData(rootdir):
+    '''
+    This method gets all the training data from the root directory of the ground truth
+    The following is the directory structure for the ground truth
+    Root_Dir
+        |_Labels
+            |_Participants
+                |_data_files
+    :param rootdir (string): path to the rood directory where the ground truth exists
+    :return:    labels      (list),                 A list of class labels
+                data        (list),                 A list of training instances
+                target      (list),                 A list of class labels corresponding to the training instances in the in 'data'
+                labelsdict  (dictionary),           A dictionary for converting class labels from string to integer and vice versa
+                avg_len     (float),                The average length of the sensor data (emg, accelerometer, gyroscope and orientation) which would later be used for normalization
+                user_map    (dictionary),           A dictionary of all participants and their corresponding file list to be used for leave one out test later
+                user_list   (list),                 A list of all participants
+                data_dict   (dictionary)            A dictionary containing a mapping of all the class labels, participants, and files of the participants which can be used later for transforming the data for leave one out test
+                max_len     (integer)               the maximum length of the sensor data
+                data_path   (list)                  A list that will hold the path to every training instance in the 'data list'
+    '''
+
+    # List of all training labels
+    training_class_dirs = os.walk(rootdir)
+
+
+    labels = []                         # Empty list to hold all the class labels
+    labelsdict = {}                     # Dictionary to store the labels and their correspondig interger values
+    labeldirs = []                      # Directory paths of all labels
+    target = []                         # List that will hold class labels of the training instances in 'data list'
+    data = []                           # List that will hold all the training/validation instances
+    sample_len_vec_emg = []             # List that holds that length of all the sensor data. It will be used later for calculating average length
+    sample_len_vec_others = []          # List that holds that length of all the sensor data. It will be used later for calculating average length
+    data_dict = {}                      # The dictionary that will hold that mappings for all labels, participants of the the label and data files corresponding to all the participants. This will be used later for leave one out test
+    user_map = {}                       # A dictionary that will hold the mappings for all participants and their corresponding ids
+    user_list = []                      # A list of all participants
+    user_ids = np.arange(100).tolist()  # A pre generated list of userids for assigning a unique id to every user
+    data_path = []                      # A list that will hold the path to every training instance in the 'data list'
+
+    # Get the list of labels by walking the root directory
     for trclass in training_class_dirs:
         labels = trclass[1]
         break
 
+    # extracting list of participants for each label
     for i,label in enumerate(labels):
-        dict = {}
-        lbl_users_lst = []
+        dict = {}                                   # dictionary to store participant information
+        lbl_users_lst = []                          # list of participants per label
         labelsdict[label] = i
         labeldir = os.path.join(rootdir,label)
+
+        #list of users for the respective label
         lbl_usrs = os.walk(labeldir)
 
+        #enumerating all the users of the respective label
         for usr in lbl_usrs:
             #print(usr)
             lbl_users_lst = usr[1]
+
+            #assigning unique ids to all the users
             for i,user in enumerate(lbl_users_lst):
                 if user not in user_map:
                     id = user_ids.pop()
@@ -62,6 +109,7 @@ def getTrainingData(rootdir):
                     user_list.append(id)
             break
 
+        #extracting data file list for every  participant
         for usr in lbl_users_lst:
             usrdir = os.path.join(labeldir,usr)
             filewalk = os.walk(usrdir)
@@ -72,8 +120,9 @@ def getTrainingData(rootdir):
             dict[usr] = (usrdir,file_list)
 
         dict['users'] = lbl_users_lst
-        data_dict[label] = dict
+        data_dict[label] = dict                 # add all meta information to data_dict
 
+    # Extracting data from the data files from all participants
     for key, value in data_dict.items():
         tar_val = int(key)
         users = value['users']
@@ -82,32 +131,34 @@ def getTrainingData(rootdir):
             dirPath = user_dir[0]
             filelist = user_dir[1]
             for file in filelist:
-                fileData = read_json_file(os.path.join(dirPath,file))
+                fp = os.path.join(dirPath,file)
 
+                data_path.append(fp)
+
+                fileData = read_json_file(fp)
                 # extract data from the dictionary
-
                 # emg
-                emg = fe.max_abs_scaler.fit_transform(np.array(fileData['emg']['data']))
+                emg = np.array(fileData['emg']['data'])
                 emgts = np.array(fileData['emg']['timestamps'])
 
                 # accelerometer
-                acc = fe.max_abs_scaler.fit_transform(np.array(fileData['acc']['data']))
+                acc = np.array(fileData['acc']['data'])
                 accts = np.array(fileData['acc']['timestamps'])
 
                 # gyroscope
-                gyr = fe.max_abs_scaler.fit_transform(np.array(fileData['gyr']['data']))
+                gyr = np.array(fileData['gyr']['data'])
                 gyrts = np.array(fileData['gyr']['timestamps'])
 
                 # orientation
-                ori = fe.max_abs_scaler.fit_transform(np.array(fileData['ori']['data']))
+                ori = np.array(fileData['ori']['data'])
                 orits = np.array(fileData['ori']['timestamps'])
 
                 # create training instance
                 ti = tri.TrainingInstance(key, emg, acc, gyr, ori, emgts, accts, gyrts, orits)
 
                 # add length for resampling later to the sample length vector
-                sample_len_vec.append(emg.shape[0])
-                sample_len_vec.append(acc.shape[0])
+                sample_len_vec_emg.append(emg.shape[0])
+                sample_len_vec_others.append(acc.shape[0])
 
                 # split raw data
                 ti.separateRawData()
@@ -117,17 +168,33 @@ def getTrainingData(rootdir):
 
                 # append class label to target list
                 target.append(tar_val)
-    avg_len = int(np.mean(sample_len_vec))
-    return labels,data,target,labelsdict,avg_len,user_map,user_list,data_dict
+    avg_len_emg = int(np.mean(sample_len_vec_emg))
+    avg_len_acc = int(np.mean(sample_len_vec_others))
+    max_length_emg = np.amax(sample_len_vec_emg)
+    max_length_others = np.amax(sample_len_vec_others)
+    return labels,data,target,labelsdict,avg_len_emg,avg_len_acc,user_map,user_list,data_dict,max_length_emg,max_length_others,data_path
 
-def resampleTrainingData(data,sample_length):
-    data = np.array([ti.resampleData(sample_length) for ti in data])
+def normalizeTrainingData(data,max_length_emg,max_len_others):
+    data = np.array([ti.normalizeData(max_length_emg,max_len_others) for ti in data])
     return data
 
-def extractFeatures(data,scaler = None,window=True,rms=False,f_mfcc=False):
-    data = np.array([ti.extractFeatures(window,scaler,rms,f_mfcc) for ti in data])
+def resampleTrainingData(data,sampling_rate,avg_len,emg=True,imu=True):
+    data = np.array([ti.resampleData(sampling_rate,avg_len,emg,imu) for ti in data])
     return data
 
+def extractFeatures(data,scaler = None,window=True,rms=False,f_mfcc=False,emg=True,imu=True):
+    '''
+    method to loop through all training instances and extract features from the signals
+    @params: data (list)                : list of training instances
+             scaler (sclaer object)     : scaler object to scale features if necessary
+             window (Boolean)           : To get overlapping window features
+             rms (Boolean)              : To get features from the rms value of the signals in all directions
+             f_mfcc (Boolean)           :  to get the MFCC features as well
+    @return: data (list)                : list of training instances with extracted features
+    '''
+    data = np.array([ti.extractFeatures(window,scaler,rms,f_mfcc,emg,imu) for ti in data])
+    return data
+'''
 def prepareDataPC(target, data):
     consolidate = zip(target,data)
     for lbl,d in consolidate:
@@ -141,7 +208,7 @@ def prepareDataPC(target, data):
 
 
     return np.array(train_x),np.array(train_y),np.array(test_x),np.array(test_y)
-
+'''
 def prepareTrainingDataSvm(trainingIndexes,testingIndexes, target, data):
     train_x = None    #training data
     train_y = []    #training labels

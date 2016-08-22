@@ -1,27 +1,14 @@
 from utils import utility as util
 from utils import dataprep as dp
 import os
-import numpy as np
-import pandas as pd
-from pandas.tools.plotting import parallel_coordinates,andrews_curves
-import matplotlib.pyplot as plt
 
 
-dataRep = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Features\GlobalFeatures'
+
+dataRep = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Features\GlobalFeatures\data'
 rootDir = r"C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual"
 cacheDir = r'G:\PROJECTS\Voice\lazarus\resources\pcord'
-plotDir = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Features\GlobalFeaturesPlot'
+plotDir = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Features\GlobalFeatures\plots'
 cacheRefresh = False
-
-def saveParallelCoord(fnale):
-    data = pd.read_csv(os.path.join(plotDir, fnale))
-    plt.figure()
-    #parallel_coordinates(data, 'label')
-    andrews_curves(data, 'label')
-    plt.show()
-    flname = fnale+'.png'
-    #plt.savefig(os.path.join(plotDir, flname))
-
 
 if __name__ == "__main__":
     util.createDir(dataRep)
@@ -42,32 +29,34 @@ if __name__ == "__main__":
         data = featData
     con = zip(target,data)
 
-    header = ['t_gradient change', 't_zero crossing', 't_window length', 't_rms', 't_mean', 't_variance', 't_ssi',
-              't_iemg', 't_peaks', 't_minima', 't_maxima', 'f_mean', 'f_peaks', 'f_total power', 'f_power variance',
+    header = ['t_gradient_change', 't_zero_crossing', 't_window_length', 't_rms', 't_mean', 't_variance', 't_ssi',
+              't_iemg', 't_peaks', 't_minima', 't_maxima', 'f_mean', 'f_peaks', 'f_total_power', 'f_power_variance',
               'f_minima', 'f_maxima','label']
-    con_emg_0 = []
-    con_emg_1 = []
-    con_emg_2 = []
-    con_emg_3 = []
-    con_emg_4 = []
-    con_emg_5 = []
-    con_emg_6 = []
-    con_emg_7 = []
+    con_emg_0 = [header]
+    con_emg_1 = [header]
+    con_emg_2 = [header]
+    con_emg_3 = [header]
+    con_emg_4 = [header]
+    con_emg_5 = [header]
+    con_emg_6 = [header]
+    con_emg_7 = [header]
 
-    con_acc_x = []
-    con_acc_y = []
-    con_acc_z = []
+    con_acc_x = [header]
+    con_acc_y = [header]
+    con_acc_z = [header]
 
-    con_gyr_x = []
-    con_gyr_y = []
-    con_gyr_z = []
+    con_gyr_x = [header]
+    con_gyr_y = [header]
+    con_gyr_z = [header]
 
-    con_ori_x = []
-    con_ori_y = []
-    con_ori_z = []
-    con_ori_w = []
+    con_ori_x = [header]
+    con_ori_y = [header]
+    con_ori_z = [header]
+    con_ori_w = [header]
 
     for lbl,d in con:
+        #if lbl == 0 or lbl == 1 or lbl == 2 or lbl == 3 or lbl == 4 or lbl == 5 or lbl == 6 or lbl == 7:
+        #    continue
         emg_0_feat, emg_1_feat, emg_2_feat, emg_3_feat, emg_4_feat, emg_5_feat, emg_6_feat, emg_7_feat, acc_x_feat, acc_y_feat, acc_z_feat, gyr_x_feat, gyr_y_feat, gyr_z_feat, ori_x_feat, ori_y_feat, ori_z_feat, ori_w_feat = d.getIndevidualFeatures()
 
         con_emg_0.append(emg_0_feat)
@@ -92,26 +81,24 @@ if __name__ == "__main__":
         con_ori_z.append(ori_z_feat)
         con_ori_w.append(ori_w_feat)
 
-    np.savetxt(os.path.join(dataRep, 'emg_0.csv'), con_emg_0, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_1.csv'), con_emg_1, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_2.csv'), con_emg_2, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_3.csv'), con_emg_3, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_4.csv'), con_emg_4, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_5.csv'), con_emg_5, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_6.csv'), con_emg_6, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'emg_7.csv'), con_emg_7, delimiter=",")
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_0.csv'), con_emg_0)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_1.csv'), con_emg_1)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_2.csv'), con_emg_2)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_3.csv'), con_emg_3)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_4.csv'), con_emg_4)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_5.csv'), con_emg_5)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_6.csv'), con_emg_6)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'emg_7.csv'), con_emg_7)
 
-    np.savetxt(os.path.join(dataRep, 'acc_0.csv'), con_acc_x, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'acc_1.csv'), con_acc_y, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'acc_2.csv'), con_acc_z, delimiter=",")
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'acc_0.csv'), con_acc_x)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'acc_1.csv'), con_acc_y)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'acc_2.csv'), con_acc_z)
 
-    np.savetxt(os.path.join(dataRep, 'gyr_0.csv'), con_gyr_x, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'gyr_1.csv'), con_gyr_y, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'gyr_2.csv'), con_gyr_z, delimiter=",")
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'gyr_0.csv'), con_gyr_x)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'gyr_1.csv'), con_gyr_y)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'gyr_2.csv'), con_gyr_z)
 
-    np.savetxt(os.path.join(dataRep, 'ori_0.csv'), con_ori_x, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'ori_1.csv'), con_ori_y, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'ori_2.csv'), con_ori_z, delimiter=",")
-    np.savetxt(os.path.join(dataRep, 'ori_3.csv'), con_ori_w, delimiter=",")
-
-    saveParallelCoord('acc_0.csv')
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'ori_0.csv'), con_ori_x)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'ori_1.csv'), con_ori_y)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'ori_2.csv'), con_ori_z)
+    util.saveMatrixToCsvFile(os.path.join(dataRep, 'ori_3.csv'), con_ori_w)

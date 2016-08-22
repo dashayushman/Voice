@@ -2,6 +2,19 @@ from tabulate import tabulate
 import numpy as np
 import os
 import markdown2
+import csv
+
+#method to pad a vector with and normalize to a fixed length
+def padVector(vec,front,back,emg=False):
+    if emg:
+        return np.lib.pad(vec, (front, back), 'constant', constant_values=(0, 0))
+    else:
+        return np.lib.pad(vec, (front, back), 'constant', constant_values=(vec[0], vec[-1]))
+
+def saveMatrixToCsvFile(filepath,mat):
+    with open(filepath, "w",newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(mat)
 
 def createDir(dirPath):
     if not os.path.exists(dirPath):
