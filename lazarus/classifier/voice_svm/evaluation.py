@@ -5,7 +5,32 @@ from utils import utility as util
 import os
 import time
 
-def evaluate(n_folds,tp,rootDir,reportDir,cacheDir,modelGenerator,sampling_rate=50,prnt=True,filewrt=False,cacherefresh=False,scaler = None):
+def evaluate(n_folds,
+             tp,
+             rootDir,
+             reportDir,
+             cacheDir,
+             modelGenerator,
+             sampling_rate=50,
+             prnt=True,
+             filewrt=False,
+             cacherefresh=False,
+             scaler = None):
+    '''
+    Method to run an evaluation of SVM on the training and validation data given the parameters required
+    :param n_folds:             (int)                       : Number of folds for k-fold cross-validation
+    :param tp:                  (dictionary)                : Tuned parameters for SVM grid search
+    :param rootDir:             (string)                    : The root directory of the Ground Truth
+    :param reportDir:           (string)                    : directory path to save the classification report
+    :param cacheDir:            (string)                    : Directory path to look for cached features
+    :param modelGenerator:      (model_generator object)    : to generate an SVM models and evaluate them
+    :param sampling_rate:       (int)                       : Sampling rate that we want to resample the data to
+    :param prnt:                (boolean)                   : Flag to print the classification report in the console
+    :param filewrt:             (boolean)                   : Flag to write the classification into a file
+    :param cacherefresh:        (boolean)                   : Refresh the cache
+    :param scaler:              (scalar object)             : To scale the sensor data
+    :return:
+    '''
     fileContent = []    # empty list for storing the classification report data which will be used later for writing to a file
     accuracies = []     # list of accuracies in every fold of the crossvalidation
 

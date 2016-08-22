@@ -39,8 +39,8 @@ def getFeatures(data,samplingRate,window=False,f_mfcc=False):
         ovlp_windows = [data]
         windowed_frames = ovlp_windows
     else:
-        window_size = int(samplingRate*1)  # a window length of 0.025 seconds
-        overlap_size = int(samplingRate*0.5)  # a window overlap of 0.01 seconds
+        window_size = int(samplingRate*1)  # a window length of 1 seconds
+        overlap_size = int(samplingRate*0.5)  # a window overlap of 0.5 seconds
         ovlp_windows = get_sliding_windows(data,window_size,overlap_size)
         # apply hamming window function
         windowed_frames = windowfn(ovlp_windows)

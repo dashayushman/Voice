@@ -10,14 +10,16 @@ def generateModel(trainingData,labels,n_states = 3):
         model_list = []
         for s in n_states:
             models = {}
-            for label in labels:
+            for i,label in enumerate(labels):
+                print(str((i / len(labels)) * 100) + '% comleted')
                 if int(label) in trainingData:
                     trs = trainingData.get(int(label))
                     data = trs['data']
                     l_data = trs['datal']
-                    hmm_model = GaussianHMM(n_components=s, covariance_type="diag", n_iter=1000).fit(data,l_data)
+                    hmm_model = GaussianHMM(n_components=s, covariance_type="diag", n_iter=10000).fit(data,l_data)
                     objModel = hmmmod.OneHmmModel(hmm_model)
                     models[label] = objModel
+            print('finished!!! generating HMM for ' + str(s) + ' states')
             model_list.append(models)
         return model_list
     models = {}

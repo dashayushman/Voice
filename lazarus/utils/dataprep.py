@@ -15,8 +15,13 @@ def scaleData(data,scaler):
     :return: data: (list) List of a ll the scaled training data objects
     '''
 
-    data = np.array([ti.scaleData(scaler) for ti in data])
-    return data
+    #data = np.array([ti.scaleData(scaler) for ti in data])
+    d = []
+    for i, ti in enumerate(data):
+        if i % 50 is 0:
+            print(str(i) + ' out of ' + str(len(data)) + 'training instances scaled')
+        d.append(ti.scaleData(scaler))
+    return np.array(d)
 
 # Serielize objects to disk for future reuse to make things faster
 def dumpObject(filePath,object):
@@ -175,12 +180,40 @@ def getTrainingData(rootdir):
     return labels,data,target,labelsdict,avg_len_emg,avg_len_acc,user_map,user_list,data_dict,max_length_emg,max_length_others,data_path
 
 def normalizeTrainingData(data,max_length_emg,max_len_others):
-    data = np.array([ti.normalizeData(max_length_emg,max_len_others) for ti in data])
-    return data
+    '''
+    Method to normalize the training data to fixed length
+    :param data: (list) List of all the training instance objects
+    :param max_length_emg: (int) Normalized length for EMG signals
+    :param max_len_others: (int) Normalized length of IMU signals
+    :return: data (list) List of all the normalized training instance objects
+    '''
+    #data = np.array([ti.normalizeData(max_length_emg,max_len_others) for ti in data])
+    d = []
+    for i, ti in enumerate(data):
+        if i % 50 is 0:
+            print(str(i) + ' out of ' + str(len(data)) + 'training instances normalized')
+        d.append(ti.normalizeData(max_length_emg,max_len_others))
+    return np.array(d)
 
 def resampleTrainingData(data,sampling_rate,avg_len,emg=True,imu=True):
-    data = np.array([ti.resampleData(sampling_rate,avg_len,emg,imu) for ti in data])
-    return data
+    '''
+    Method to resample the training instances to a given sampling frequency in HZ.
+    It calls consolidate data implicitly.
+    Can remove the consolidation to a different method.
+    :param data: (list) List of all the training instance objects
+    :param sampling_rate: (int) The new sampling rate in Hz
+    :param avg_len: (int) Average length of vectors in case both EMG and IMU needs to be resampled and consolidated
+    :param emg: (boolean) Flag to indicate that we need to consider emg signals for consolidating the data after resampling
+    :param imu: (boolean) Flag to indicate that we need to consider IMU signals for consolidating the data after resampling
+    :return: data : resampled data
+    '''
+    #data = np.array([ti.resampleData(sampling_rate,avg_len,emg,imu) for ti in data])
+    d = []
+    for i, ti in enumerate(data):
+        if i % 50 is 0:
+            print(str(i) + ' out of ' + str(len(data)) + 'training instances normalized')
+        d.append(ti.resampleData(sampling_rate,avg_len,emg,imu))
+    return np.array(d)
 
 def extractFeatures(data,scaler = None,window=True,rms=False,f_mfcc=False,emg=True,imu=True):
     '''
@@ -192,8 +225,13 @@ def extractFeatures(data,scaler = None,window=True,rms=False,f_mfcc=False,emg=Tr
              f_mfcc (Boolean)           :  to get the MFCC features as well
     @return: data (list)                : list of training instances with extracted features
     '''
-    data = np.array([ti.extractFeatures(window,scaler,rms,f_mfcc,emg,imu) for ti in data])
-    return data
+    #data = np.array([ti.extractFeatures(window,scaler,rms,f_mfcc,emg,imu) for ti in data])
+    d = []
+    for i,ti in enumerate(data):
+        if i%20 is 0:
+            print('features extracted from '+str(i)+' out of ' + str(len(data)) +'training instances')
+        d.append(ti.extractFeatures(window, scaler, rms, f_mfcc, emg, imu))
+    return np.array(d)
 '''
 def prepareDataPC(target, data):
     consolidate = zip(target,data)
@@ -240,7 +278,12 @@ def prepareTrainingDataSvm(trainingIndexes,testingIndexes, target, data):
 
 def prepareTrainingDataHmmFeatures(trainingIndexes, target, data):
     trainingData = {}
-    for tid in trainingIndexes:
+    for l,tid in enumerate(trainingIndexes):
+
+        # printing corrent status so that the wait is not too boring :-P
+        if l % 50 is 0:
+            print(str(l) + ' out of ' + str(len(trainingIndexes)) + 'training instances prepared')
+
         key = target[tid]
         ti = data[tid]
         #con_data = ti.getConsolidatedDataMatrix()
@@ -280,7 +323,11 @@ def prepareTrainingDataHmmFeatures(trainingIndexes, target, data):
 
 def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
     trainingData = {}
-    for tid in trainingIndexes:
+    for l,tid in enumerate(trainingIndexes):
+        #printing corrent status so that the wait is not too boring :-P
+        if l % 50 is 0:
+            print(str(l) + ' out of ' + str(len(trainingIndexes)) + 'training instances prepared')
+
         key = target[tid]
         ti = data[tid]
         #con_data = ti.getConsolidatedDataMatrix()

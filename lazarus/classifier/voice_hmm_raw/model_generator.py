@@ -9,8 +9,8 @@ def generateModel(trainingData,labels,n_states = 3):
         model_list = []
         for s in n_states:
             models = {}
-            for label in labels:
-                #print('generating model for label ',label)
+            for i,label in enumerate(labels):
+                print(str((i/len(labels))*100) + '% comleted')
                 if int(label) in trainingData:
                     trs = trainingData.get(int(label))
                     data = trs['data']
@@ -19,6 +19,7 @@ def generateModel(trainingData,labels,n_states = 3):
                     objModel = hmmmod.OneHmmModel(hmm_model)
                     models[label] = objModel
                 #print('generated model for label ', label)
+            print('finished!!! generating HMM for '+ str(s)+ ' states')
             model_list.append(models)
         return model_list
     models = {}

@@ -39,13 +39,14 @@ if __name__ == "__main__":
     util.createDir(repDir)
 
     '''
+    '''
     print('Evaluating Various classifiers')
     print()
 
     # Evaluate Hidden Markov Model based Classifier with features extracted using a sliding window
     print('Evaluating HMM with windowed features')
     hmmfeat.evaluate(n_folds=5,                                         # Number of folds for cross validation
-                     n_states_l=[10],                                   # Number of states in the HMM
+                     n_states_l=[18],                                   # Number of states in the HMM
                      rootDir=rd,                                        # Root directory for ground truth
                      reportDir=repDir,                                  # Directory to store the classification report
                      cacheDir=os.path.join(cacheDir,'hmmfeatures'),     # Path to the cache directory
@@ -55,6 +56,7 @@ if __name__ == "__main__":
                      cacherefresh=False)                                # to delete and recreate the cache file before running any evaluation
     print()
 
+    '''
     # Evaluate Hidden Markov Model based Classifier with raw data
     print('Evaluating HMM with raw data')
     hmmraw.evaluate(n_folds=5,                                          # Number of folds for cross validation
@@ -62,9 +64,12 @@ if __name__ == "__main__":
                      rootDir=rd,                                        # Root directory for ground truth
                      reportDir=repDir,                                  # Directory to store the classification report
                      modelGenerator=m_hmmraw,                           # Reference to the model generator object for creating a Hidden Markov Model
+                     sampling_rate=20,                                  # new sampling rate for normalizing the data
                      prnt=False,                                        # To print the classification Report in the console
-                     filewrt=True)                                      # To write the classification report to a file
+                     filewrt=True,                                      # To write the classification report to a file
+                     scaler = max_abs_scaler)                           # scaler used for scaling the sensor data
     print()
+
 
     # Evaluate K- Nearest Neighbors Classifier with global features
     print('Evaluating KNN with global features')
@@ -74,9 +79,11 @@ if __name__ == "__main__":
                  reportDir=repDir,                                      # Directory to store the classification report
                  cacheDir=os.path.join(cacheDir, 'globalfeatures'),     # Path to the cache directory
                  modelGenerator=m_knn,                                  # Reference to the model generator object for creating a K-Nearest Neighbor Classifier
+                 sampling_rate=20,                                      # new sampling rate for normalizing the data
                  prnt=False,                                            # To print the classification Report in the console
                  filewrt=True,                                          # To write the classification report to a file
-                 cacherefresh=False)                                    # to delete and recreate the cache file before running any evaluation
+                 cacherefresh=False,                                    # to delete and recreate the cache file before running any evaluation
+                 scaler = max_abs_scaler)                               # scaler used for scaling the sensor data
     print()
 
     # Evaluate Naive Bayes Classifier with global features
@@ -87,11 +94,13 @@ if __name__ == "__main__":
                  reportDir=repDir,                                      # Directory to store the classification report
                  cacheDir=os.path.join(cacheDir, 'globalfeatures'),     # Path to the cache directory
                  modelGenerator=m_nb,                                   # Reference to the model generator object for creating a Naive Bayes Classifier
+                 sampling_rate=20,                                      # new sampling rate for normalizing the data
                  prnt=False,                                            # To print the classification Report in the console
                  filewrt=True,                                          # To write the classification report to a file
-                 cacherefresh=False)                                    # to delete and recreate the cache file before running any evaluation
+                 cacherefresh=False,                                    # to delete and recreate the cache file before running any evaluation
+                 scaler = max_abs_scaler)                               # scaler used for scaling the sensor data
     print()
-    '''
+
 
     # Evaluate Support vector Machine with global features
     print('Evaluating SVM with global features')
@@ -104,7 +113,9 @@ if __name__ == "__main__":
                   sampling_rate=20,                                     # new sampling rate for normalizing the data
                   prnt=False,                                           # To print the classification Report in the console
                   filewrt=True,                                         # To write the classification report to a file
-                  cacherefresh=False,                                    # to delete and recreate the cache file before running any evaluation
-                  scaler=max_abs_scaler)                                #scaler used for scaling the sensor data
+                  cacherefresh=False,                                   # to delete and recreate the cache file before running any evaluation
+                  scaler=max_abs_scaler)                                # scaler used for scaling the sensor data
     print()
+    '''
     print('Done!!!!')
+
