@@ -192,6 +192,8 @@ def normalizeTrainingData(data,max_length_emg,max_len_others):
     for i, ti in enumerate(data):
         if i % 50 is 0:
             print(str(i) + ' out of ' + str(len(data)) + 'training instances normalized')
+        if i is 2 or i is 4:
+            print('case')
         d.append(ti.normalizeData(max_length_emg,max_len_others))
     return np.array(d)
 

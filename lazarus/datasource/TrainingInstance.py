@@ -96,7 +96,7 @@ class TrainingInstance:
                     norm_emgs.append(x)
                     continue
                 if(x.shape[0] < max_len_emg):
-                    half = (max_len_emg - x.shape[0])/2
+                    half = (float(max_len_emg - x.shape[0]))/2
                     back = ceil(half)
                     front = floor(half)
                     norm_emgs.append(util.padVector(x,front,back,True))
@@ -107,11 +107,11 @@ class TrainingInstance:
                     norm_gyrs.append(b)
                     continue
                 if (a.shape[0] < max_len_others):
-                    half_a = (max_len_others - a.shape[0]) / 2
+                    half_a = (float(max_len_others - a.shape[0])) / 2
                     back_a = ceil(half_a)
                     front_a = floor(half_a)
 
-                    half_b = (max_len_others - b.shape[0]) / 2
+                    half_b = (float(max_len_others - b.shape[0])) / 2
                     back_b = ceil(half_b)
                     front_b = floor(half_b)
 
@@ -123,7 +123,7 @@ class TrainingInstance:
                     norm_oris.append(x)
                     continue
                 if (x.shape[0] < max_len_others):
-                    half = (max_len_others - x.shape[0]) / 2
+                    half = (float(max_len_others - x.shape[0])) / 2
                     back = ceil(half)
                     front = floor(half)
                     norm_oris.append(util.padVector(x, front, back))

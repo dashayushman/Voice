@@ -7,9 +7,9 @@ import csv
 #method to pad a vector with and normalize to a fixed length
 def padVector(vec,front,back,emg=False):
     if emg:
-        return np.lib.pad(vec, (front, back), 'constant', constant_values=(0, 0))
+        return np.lib.pad(vec, (int(front), int(back)), 'constant', constant_values=(0, 0))
     else:
-        return np.lib.pad(vec, (front, back), 'constant', constant_values=(vec[0], vec[-1]))
+        return np.lib.pad(vec, (int(front), int(back)), 'constant', constant_values=(vec[0], vec[-1]))
 
 def saveMatrixToCsvFile(filepath,mat):
     with open(filepath, "w",newline='') as f:

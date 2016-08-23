@@ -18,13 +18,30 @@ from sklearn import preprocessing
 import os
 
 # The root directory where we have the ground truth (Training and validation data)
-rd = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual\individual_ayushman'
+
+#windows
+#rd = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual\individual_ayushman'
+
+#linux
+rd = r'/home/ayushman/projects/Voice/resources/data/trainingdata/individual/individual_ayushman'
+
 
 # Directory path to store the classification report
-repDir = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\reports\Clf_Reports'
+
+#windows
+#repDir = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\reports\Clf_Reports'
+
+#linux
+repDir = r'/home/ayushman/projects/Voice/resources/data/clfreports'
+
 
 # Directory to look for cached data (Pre-computed features) to avoid calculating them again and again
-cacheDir = r'G:\PROJECTS\Voice\lazarus\resources'
+
+#windows
+#cacheDir = r'G:\PROJECTS\Voice\lazarus\resources'
+
+#linux
+cacheDir = r'/home/ayushman/projects/Voice/lazarus/resources'
 
 # parameters to do a grid search on SVM
 svm_tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4, 1e-5, 1e-6],
@@ -38,11 +55,11 @@ if __name__ == "__main__":
     # Creating a directory for storing the classification report if it does not exist
     util.createDir(repDir)
 
-    '''
-    '''
+
+
     print('Evaluating Various classifiers')
     print()
-
+    '''
     # Evaluate Hidden Markov Model based Classifier with features extracted using a sliding window
     print('Evaluating HMM with windowed features')
     hmmfeat.evaluate(n_folds=5,                                         # Number of folds for cross validation
@@ -56,7 +73,7 @@ if __name__ == "__main__":
                      cacherefresh=False)                                # to delete and recreate the cache file before running any evaluation
     print()
 
-    '''
+
     # Evaluate Hidden Markov Model based Classifier with raw data
     print('Evaluating HMM with raw data')
     hmmraw.evaluate(n_folds=5,                                          # Number of folds for cross validation
@@ -85,7 +102,7 @@ if __name__ == "__main__":
                  cacherefresh=False,                                    # to delete and recreate the cache file before running any evaluation
                  scaler = max_abs_scaler)                               # scaler used for scaling the sensor data
     print()
-
+    '''
     # Evaluate Naive Bayes Classifier with global features
     print('Evaluating Naive Bayes with global features')
     nb.evaluate(n_folds=5,                                              # Number of folds for cross validation
@@ -101,7 +118,7 @@ if __name__ == "__main__":
                  scaler = max_abs_scaler)                               # scaler used for scaling the sensor data
     print()
 
-
+    '''
     # Evaluate Support vector Machine with global features
     print('Evaluating SVM with global features')
     svm.evaluate(n_folds=5,                                             # Number of folds for cross validation

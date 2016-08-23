@@ -2,10 +2,9 @@ from sklearn import preprocessing
 import math
 import matplotlib.pyplot as plt
 import numpy as np
-from features import mfcc
-from features import sigproc
+from python_speech_features import mfcc
+from python_speech_features import sigproc
 from scipy import signal
-import pywt
 
 #concatnate methods for extracting features in a single loop
 #can be done later but the present approach will cause a huge drop in performance
