@@ -322,6 +322,31 @@ def prepareTrainingDataHmmFeatures(trainingIndexes, target, data):
 
     return trainingData
 
+def discritizeLabels(target):
+    n_classes = np.unique(target)
+    d_labels = []
+    for t in target:
+        d_l = np.zeros(n_classes.size,dtype=np.int)
+        d_l[t] = 1
+        d_labels.append(d_l)
+    return np.array(d_labels)
+
+def splitDataset(train,test,target,data):
+    train_x = np.take(data,train,axis=0)
+    train_y = np.take(target,train,axis=0)
+
+    val_x = np.take(data,test,axis=0)
+    val_y = np.take(target,test,axis=0)
+
+    return train_x,train_y,val_x,val_y
+
+def prepareDataset(data):
+    d = []
+    for i,ti in enumerate(data):
+        if i%20 is 0:
+            print('prepared '+str(i)+' out of ' + str(len(data)) +'instances')
+        d.append(ti.consolidatedDataMatrix)
+    return np.array(d)
 
 def prepareTrainingDataHmmRaw(trainingIndexes, target, data):
     trainingData = {}

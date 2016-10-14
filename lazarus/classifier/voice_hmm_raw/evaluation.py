@@ -59,6 +59,7 @@ def evaluate(n_folds,
     '''
     fileContent = []
     accuracies = []
+
     # extract training data from the root directory of the ground truth
     labels, \
     data, \
@@ -130,10 +131,3 @@ def evaluate(n_folds,
         print(str_fc)
     if filewrt:
         util.writeToFile(os.path.join(reportDir, 'Hmm_Raw_' + str(int(time.time())) + '.html'), html)
-
-
-
-
-
-
-

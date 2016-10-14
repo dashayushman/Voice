@@ -2,7 +2,8 @@
 This script evaluates all models on the same data
 It consists of methods that call individual modules of different classifiers and evaluates them and dumps their classification report to a file
 '''
-
+from classifier.voice_lstm_raw import evaluation as lstmraw
+from classifier.voice_lstm_raw import model_generator as m_lstmraw
 from classifier.voice_hmm_feature import evaluation as hmmfeat
 from classifier.voice_hmm_feature import model_generator as m_hmmfeat
 from classifier.voice_hmm_raw import evaluation as hmmraw
@@ -23,7 +24,7 @@ import os
 #rd = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual\individual_ayushman'
 
 #linux
-rd = r'/home/ayushman/projects/Voice/resources/data/trainingdata/individual/individual_ayushman'
+rd = r'/home/ayushman/projects/Voice/resources/data/trainingdata/individual/individual_john'
 
 
 # Directory path to store the classification report
@@ -58,6 +59,18 @@ if __name__ == "__main__":
 
 
     print('Evaluating Various classifiers')
+    print()
+
+    # Evaluate LSTM with raw data
+    print('Evaluating LSTM with windowed features')
+    lstmraw.evaluate(n_folds=5,                                         # Number of folds for cross validation
+                     rootDir=rd,                                        # Root directory for ground truth
+                     reportDir=repDir,                                  # Directory to store the classification report
+                     modelGenerator=m_lstmraw,                          # Reference to the model generator object for creating a lstm model
+                     sampling_rate=20,                                  # new sampling rate for normalizing the data
+                     prnt=False,                                        # To print the classification Report in the console
+                     filewrt=True,                                      # To write the classification report to a file
+                     scaler = max_abs_scaler)                           # scaler used for scaling the sensor data
     print()
     '''
     # Evaluate Hidden Markov Model based Classifier with features extracted using a sliding window
@@ -102,7 +115,7 @@ if __name__ == "__main__":
                  cacherefresh=False,                                    # to delete and recreate the cache file before running any evaluation
                  scaler = max_abs_scaler)                               # scaler used for scaling the sensor data
     print()
-    '''
+
     # Evaluate Naive Bayes Classifier with global features
     print('Evaluating Naive Bayes with global features')
     nb.evaluate(n_folds=5,                                              # Number of folds for cross validation
@@ -118,7 +131,6 @@ if __name__ == "__main__":
                  scaler = max_abs_scaler)                               # scaler used for scaling the sensor data
     print()
 
-    '''
     # Evaluate Support vector Machine with global features
     print('Evaluating SVM with global features')
     svm.evaluate(n_folds=5,                                             # Number of folds for cross validation

@@ -156,8 +156,7 @@ class TrainingInstance:
         '''
         if self.splitted == True:
 
-            if self.emgList is None:
-                print('case')
+
             #Calculate the new length of vectors given the new sampling frequency/rate
 
             sample_len_emg = int((sr*self.emgList[0].size)/self.sr_emg)
