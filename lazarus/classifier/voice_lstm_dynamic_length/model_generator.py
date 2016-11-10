@@ -41,7 +41,7 @@ def generateModel(train,test,shape,rootdir,scaler):
         # Prep input data to fit requirements of rnn.bidirectional_rnn
         #  Reshape to 2-D tensor (nTimeSteps*batchSize, nfeatures)
         inputXrs = tf.reshape(inputX, [-1, nFeatures])
-        #  Split to get a list of 'n_steps' tensors of shape (batch_size, n_hidden) Amit:we get shape(batch_size, nFeatures)
+        #  Split to get a list of 'n_steps' tensors of shape (batch_size, n_hidden)
         inputList = tf.split(0, maxTimeSteps, inputXrs)
         targetIxs = tf.placeholder(tf.int64)
         targetVals = tf.placeholder(tf.int32)
@@ -71,15 +71,15 @@ def generateModel(train,test,shape,rootdir,scaler):
         logits = [tf.matmul(t, weightsClasses) + biasesClasses for t in outH1]
 
         ####Optimizing
-        logits3d = tf.pack(logits) #maybe we have to use bidirectional lstm
+        logits3d = tf.pack(logits)
         loss = tf.reduce_mean(ctc.ctc_loss(logits3d, targetY, seqLengths))
         optimizer = tf.train.MomentumOptimizer(learningRate, momentum).minimize(loss)
 
         ####Evaluating
         logitsMaxTest = tf.slice(tf.argmax(logits3d, 2), [0, 0], [seqLengths[0], 1])
         predictions = tf.to_int32(ctc.ctc_beam_search_decoder(logits3d, seqLengths)[0][0])
-        errorRate = tf.reduce_sum(tf.edit_distance(predictions, targetY, normalize=False)) / \
-                    tf.to_float(tf.size(targetY.values))
+        correct_prediction = tf.equal(predictions, targetY)
+        errorRate = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     ####Run session
     with tf.Session(graph=graph) as session:
