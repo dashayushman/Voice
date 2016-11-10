@@ -3,12 +3,14 @@ import collections
 from tensorflow.contrib.learn.python.learn.datasets import base
 from tensorflow.python.framework import dtypes
 from sklearn.cross_validation import StratifiedKFold
-from utils import dataprep as dp
-from datasource.data import DataSet
-from utils import utility as util
+from lazarus.utils import dataprep as dp
+from lazarus.datasource.data import DataSet
+from lazarus.datasource import TrainingInstance as TrI
+from lazarus.utils import utility as util
 from sklearn.metrics import classification_report,accuracy_score,confusion_matrix
 import os
 import time
+import numpy as np
 
 
 def read_data_sets(rootDir,
@@ -51,6 +53,8 @@ def read_data_sets(rootDir,
     if resample:
         print('resample data')
         data = dp.resampleTrainingData(data, sampling_rate, avg_len_acc, emg=False, imu=True)
+    else:
+        data = dp.consolidateTrainingData(data, False, True) # required to consolidate data when resampling note done
 
     skf = StratifiedKFold(target, n_folds)
 
@@ -62,7 +66,7 @@ def read_data_sets(rootDir,
             print('split train and validation data')
             train_x,train_y,val_x,val_y = dp.splitDataset(train,test,target,data)
             train = DataSet(train_x, train_y, reshape=reshape)
-            validation = DataSet(val_x,val_y,reshape=reshape)
+            validation = DataSet(val_x,val_y, reshape=reshape)
             kFolds.append((train,validation))
         return kFolds,train_x.shape
     else:

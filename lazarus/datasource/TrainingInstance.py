@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import signal
-from utils import feature_extractor as fe
-from utils import utility as util
+from lazarus.utils import feature_extractor as fe
+from lazarus.utils import utility as util
 from math import sqrt,ceil,floor
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
@@ -177,6 +177,15 @@ class TrainingInstance:
             self.oriList = np.array([signal.resample(x, sample_len_emg_others) for x in self.oriList])
 
             self.consolidateData(avg_len,emg,imu)
+        return self
+
+    def onlyConsolidateData(self, avg_len, emg=True, imu=True):
+        '''
+        Method for only consolidating the data
+        :param avg_len: (int): length to resample data to
+        :return: self with all consolidated data
+        '''
+        self.consolidateData(avg_len, emg, imu)
         return self
 
 

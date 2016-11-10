@@ -21,8 +21,11 @@ class DataSet(object):
     # Convert shape from [num examples, rows, columns, depth]
     # to [num examples, rows*columns] (assuming depth == 1)
     if reshape:
-        instances = instances.reshape(instances.shape[0],
-                                instances.shape[1] * instances.shape[2])
+        d = []
+        for instance in instances:
+          d.append(instance.ravel())
+        instances = numpy.array(d)
+
     self._instances = instances
     self._labels = labels
     self._epochs_completed = 0

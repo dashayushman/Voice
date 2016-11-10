@@ -2,19 +2,23 @@
 This script evaluates all models on the same data
 It consists of methods that call individual modules of different classifiers and evaluates them and dumps their classification report to a file
 '''
-from classifier.voice_lstm_raw import evaluation as lstmraw
-from classifier.voice_lstm_raw import model_generator as m_lstmraw
-from classifier.voice_hmm_feature import evaluation as hmmfeat
-from classifier.voice_hmm_feature import model_generator as m_hmmfeat
-from classifier.voice_hmm_raw import evaluation as hmmraw
-from classifier.voice_hmm_raw import model_generator as m_hmmraw
-from classifier.voice_knn import evaluation as knn
-from classifier.voice_knn import model_generator as m_knn
-from classifier.voice_naive_bayes import evaluation as nb
-from classifier.voice_naive_bayes import model_generator as m_nb
-from classifier.voice_svm import evaluation as svm
-from classifier.voice_svm import model_generator as m_svm
-from utils import utility as util
+#from lazarus.classifier.voice_lstm_raw import evaluation as lstmraw
+#from lazarus.classifier.voice_lstm_raw import model_generator as m_lstmraw
+
+from lazarus.classifier.voice_lstm_dynamic_length import evaluation as lstmDL
+from lazarus.classifier.voice_lstm_dynamic_length import model_generator as m_lstmDL
+
+#from lazarus.classifier.voice_hmm_feature import evaluation as hmmfeat
+#from lazarus.classifier.voice_hmm_feature import model_generator as m_hmmfeat
+#from lazarus.classifier.voice_hmm_raw import evaluation as hmmraw
+#from lazarus.classifier.voice_hmm_raw import model_generator as m_hmmraw
+#from lazarus.classifier.voice_knn import evaluation as knn
+#from lazarus.classifier.voice_knn import model_generator as m_knn
+#from lazarus.classifier.voice_naive_bayes import evaluation as nb
+#from lazarus.classifier.voice_naive_bayes import model_generator as m_nb
+#from lazarus.classifier.voice_svm import evaluation as svm
+#from lazarus.classifier.voice_svm import model_generator as m_svm
+from lazarus.utils import utility as util
 from sklearn import preprocessing
 import os
 
@@ -24,7 +28,7 @@ import os
 #rd = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual\individual_ayushman'
 
 #linux
-rd = r'/home/ayushman/projects/Voice/resources/data/trainingdata/individual/individual_john'
+rd = r'/home/amit/Desktop/voice/individual_ayushman'
 
 
 # Directory path to store the classification report
@@ -33,7 +37,7 @@ rd = r'/home/ayushman/projects/Voice/resources/data/trainingdata/individual/indi
 #repDir = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\reports\Clf_Reports'
 
 #linux
-repDir = r'/home/ayushman/projects/Voice/resources/data/clfreports'
+repDir = r'/home/amit/Desktop/voice/resources/data/clfreports'
 
 
 # Directory to look for cached data (Pre-computed features) to avoid calculating them again and again
@@ -42,7 +46,7 @@ repDir = r'/home/ayushman/projects/Voice/resources/data/clfreports'
 #cacheDir = r'G:\PROJECTS\Voice\lazarus\resources'
 
 #linux
-cacheDir = r'/home/ayushman/projects/Voice/lazarus/resources'
+cacheDir = r'/home/amit/Desktop/voice/resources'
 
 # parameters to do a grid search on SVM
 svm_tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1e-3, 1e-4, 1e-5, 1e-6],
@@ -61,6 +65,19 @@ if __name__ == "__main__":
     print('Evaluating Various classifiers')
     print()
 
+    # Evaluate LSTM with CTC with raw data
+    print('Evaluating LSTM with CTC with windowed features')
+    lstmDL.evaluate(n_folds=5,  # Number of folds for cross validation
+                     rootDir=rd,  # Root directory for ground truth
+                     reportDir=repDir,  # Directory to store the classification report
+                     modelGenerator=m_lstmDL,  # Reference to the model generator object for creating a lstm model
+                     sampling_rate=20,  # new sampling rate for normalizing the data
+                     prnt=False,  # To print the classification Report in the console
+                     filewrt=True,  # To write the classification report to a file
+                     scaler=max_abs_scaler)  # scaler used for scaling the sensor data
+    print()
+
+    '''
     # Evaluate LSTM with raw data
     print('Evaluating LSTM with windowed features')
     lstmraw.evaluate(n_folds=5,                                         # Number of folds for cross validation
@@ -72,7 +89,7 @@ if __name__ == "__main__":
                      filewrt=True,                                      # To write the classification report to a file
                      scaler = max_abs_scaler)                           # scaler used for scaling the sensor data
     print()
-    '''
+
     # Evaluate Hidden Markov Model based Classifier with features extracted using a sliding window
     print('Evaluating HMM with windowed features')
     hmmfeat.evaluate(n_folds=5,                                         # Number of folds for cross validation
