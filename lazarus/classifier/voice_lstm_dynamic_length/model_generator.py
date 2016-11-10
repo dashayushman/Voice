@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.python.ops import rnn, rnn_cell
 import numpy as np
+import os
 
 from tensorflow.python.ops import ctc_ops as ctc
 from tensorflow.python.ops.rnn import bidirectional_rnn
@@ -12,6 +13,18 @@ n_input = 10 # 10 mfcc features
 n_steps = 68 # timesteps
 n_hidden = 128 # hidden layer num of features
 n_classes = 10 # MNIST total classes (0-9 digits)
+checkpoints_folder = "/home/amit/Desktop/voice/tf_py2.7/checkpoint"
+steps_per_checkpoint = 100
+
+def load_model(saver, sess, chkpnts_dir):
+	ckpt = tf.train.get_checkpoint_state(chkpnts_dir)
+	if ckpt and ckpt.model_checkpoint_path:
+		print("Loading previously trained model: {}".format(
+			ckpt.model_checkpoint_path))
+		saver.restore(sess, ckpt.model_checkpoint_path)
+	else:
+		print("Training with fresh parameters")
+		sess.run(tf.initialize_all_variables())
 
 def generateModel(train,test,shape,rootdir,scaler):
 
@@ -26,7 +39,9 @@ def generateModel(train,test,shape,rootdir,scaler):
     nHidden = 128
     nClasses = 11  # n_classes, plus the "blank" for CTC
 
+
     batchedData, maxTimeSteps, totalN = dp.load_batched_data(rootdir, batchSize, scaler)
+
 
     #ctc
     ####Define graph
@@ -78,7 +93,7 @@ def generateModel(train,test,shape,rootdir,scaler):
         ####Evaluating
         logitsMaxTest = tf.slice(tf.argmax(logits3d, 2), [0, 0], [seqLengths[0], 1])
         predictions = tf.to_int32(ctc.ctc_beam_search_decoder(logits3d, seqLengths)[0][0])
-        
+
         # using lavenshtein distance for sequence match
         errorRate = tf.reduce_sum(tf.edit_distance(predictions, targetY, normalize=False)) / \
                     tf.to_float(tf.size(targetY.values))
@@ -87,10 +102,14 @@ def generateModel(train,test,shape,rootdir,scaler):
         # correct_prediction = tf.equal(predictions, targetY)
         # errorRate = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
+        saver = tf.train.Saver(tf.all_variables())
+
+        if not os.path.exists(checkpoints_folder):
+            os.makedirs(checkpoints_folder)
+
     ####Run session
     with tf.Session(graph=graph) as session:
-        print('Initializing')
-        tf.initialize_all_variables().run()
+        load_model(saver, session, checkpoints_folder)
         for epoch in range(nEpochs):
             print('Epoch', epoch + 1, '...')
             batchErrors = np.zeros(len(batchedData))
@@ -109,5 +128,11 @@ def generateModel(train,test,shape,rootdir,scaler):
                 batchErrors[batch] = er * len(batchSeqLengths)
             epochErrorRate = batchErrors.sum() / totalN
             print('Epoch', epoch + 1, 'error rate:', epochErrorRate)
+
+            # Save the model checkpoint periodically.
+            if (epoch + 1) % steps_per_checkpoint == 0 or (epoch + 1) == nEpochs:
+                checkpoint_path = os.path.join(checkpoints_folder,
+                                               'model.ckpt')
+                saver.save(session, checkpoint_path, global_step=epoch)
 
     return
