@@ -78,8 +78,8 @@ def generateModel(train,test,shape,rootdir,scaler):
         ####Evaluating
         logitsMaxTest = tf.slice(tf.argmax(logits3d, 2), [0, 0], [seqLengths[0], 1])
         predictions = tf.to_int32(ctc.ctc_beam_search_decoder(logits3d, seqLengths)[0][0])
-        correct_prediction = tf.equal(predictions, targetY)
-        errorRate = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        errorRate = tf.reduce_sum(tf.edit_distance(predictions, targetY, normalize=False)) / \
+                    tf.to_float(tf.size(targetY.values))
 
     ####Run session
     with tf.Session(graph=graph) as session:
