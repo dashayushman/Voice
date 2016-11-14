@@ -6,7 +6,8 @@ import numpy as np
 from lazarus.utils import feature_extractor as fe
 import pickle
 import random
-
+from sklearn.model_selection import KFold
+#from sklearn.cross_validation import StratifiedKFold
 
 def scaleData(data,scaler):
     '''
@@ -486,7 +487,7 @@ def target_list_to_sparse_tensor(targetList):
     return (np.array(indices), np.array(vals), np.array(shape))
 
 #For CTC implementation
-def data_lists_to_batches(inputList, targetList, batchSize):
+def data_lists_to_batches(inputList, targetList, batchSize, trainMaxSteps = 0):
     '''Takes a list of input matrices and a list of target arrays and returns
        a list of batches, with each batch being a 3-element tuple of inputs,
        targets, and sequence lengths.
@@ -505,6 +506,8 @@ def data_lists_to_batches(inputList, targetList, batchSize):
     for inp in inputList:
         maxSteps = max(maxSteps, inp.shape[1])
 
+    if(trainMaxSteps):
+        maxSteps = trainMaxSteps
     randIxs = np.random.permutation(len(inputList))
     start, end = (0, batchSize)
     dataBatches = []
@@ -747,3 +750,48 @@ def load_batched_data(rootdir, batchSize, scaler):
 
     return data_lists_to_batches(ginputList, gtargetList, batchSize) + (len(gtargetList),)
 
+def splitDynSizeDataset(train,test,target,data):
+    train_x = []
+    train_y = []
+
+    for i in train:
+        train_x.append(data[i])
+        train_y.append(target[i])
+
+    val_x = []
+    val_y = []
+
+    for i in test:
+        val_x.append(data[i])
+        val_y.append(target[i])
+
+    return train_x, train_y, val_x, val_y
+
+def read_data_sets(rootdir,
+                   scaler,
+                   n_folds):
+    '''returns 3-element tuple: batched data (list), max # of time steps (int), and
+           total number of samples (int)'''
+    _, inputList, targetList, _, _, _, _, _, _, _, _, _ = getTrainingDataDrnn(rootdir, scaler)
+
+    ginputList, gtargetList = groupData(inputList, targetList, groupSize=4)
+
+    skf = KFold(n_folds)
+    if n_folds > 0:
+        kFolds = []
+        # for train, test in skf:
+        #     print('split train and validation data')
+        #     train_x,train_y,val_x,val_y = splitDataset(train,test,gtargetList,ginputList)
+        #     #train = data_lists_to_batches(train_x, train_y, batchSize) + (len(train_y),)
+        #     #validation = data_lists_to_batches(val_x, val_y, batchSize) + (len(val_y),)
+        for train_index, test_index in skf.split(ginputList, gtargetList):
+            print("TRAIN:", train_index, "TEST:", test_index)
+            train_x, train_y, val_x, val_y = splitDynSizeDataset(train_index, test_index, gtargetList, ginputList)
+            #train_x, val_x = ginputList[train_index], ginputList[test_index]
+            #train_y, val_y = gtargetList[train_index], gtargetList[test_index]
+            train = (train_x, train_y)
+            validation = (val_x, val_y)
+            kFolds.append((train,validation))
+        return kFolds
+    else:
+        return ginputList, gtargetList

@@ -26,12 +26,12 @@ def load_model(saver, sess, chkpnts_dir):
 		print("Training with fresh parameters")
 		sess.run(tf.initialize_all_variables())
 
-def generateModel(train,test,shape,rootdir,scaler):
+def generateModel(train,test):
 
     # learning Parameters
     learningRate = 0.001
-    nEpochs = 1000
-    batchSize = 20
+    nEpochs = 10
+    batchSize = 10
     momentum = 0.9 #for faster convergence and reduced oscillation in gradient descent
 
     # Network Parameters
@@ -40,17 +40,20 @@ def generateModel(train,test,shape,rootdir,scaler):
     nClasses = 11  # n_classes, plus the "blank" for CTC
 
 
-    batchedData, maxTimeSteps, totalN = dp.load_batched_data(rootdir, batchSize, scaler)
-
+    #batchedData, maxTimeSteps, totalN = dp.load_batched_data(rootdir, batchSize, scaler)
+    batchedData, maxTimeSteps = dp.data_lists_to_batches(train[0], train[1], batchSize)
+    testbatchedData, testmaxTimeSteps = dp.data_lists_to_batches(test[0], test[1], len(test[1]))
+    #batchedData, maxTimeSteps = dp.data_lists_to_batches(train, test, batchSize)
+    totalN = len(train[1])
 
     #ctc
     ####Define graph
     print('Defining graph')
     graph = tf.Graph()
     with graph.as_default():
-
         ####NOTE: try variable-steps inputs and dynamic bidirectional rnn, when it's implemented in tensorflow
 
+        global_step = tf.Variable(0, trainable=False)
         ####Graph input
         inputX = tf.placeholder(tf.float32, shape=(maxTimeSteps, batchSize, nFeatures))
         # Prep input data to fit requirements of rnn.bidirectional_rnn
@@ -111,7 +114,7 @@ def generateModel(train,test,shape,rootdir,scaler):
     with tf.Session(graph=graph) as session:
         load_model(saver, session, checkpoints_folder)
         for epoch in range(nEpochs):
-            print('Epoch', epoch + 1, '...')
+            #print('Epoch', epoch + 1, '...')
             batchErrors = np.zeros(len(batchedData))
             batchRandIxs = np.random.permutation(len(batchedData))  # randomize batch order
             for batch, batchOrigI in enumerate(batchRandIxs):
@@ -120,14 +123,14 @@ def generateModel(train,test,shape,rootdir,scaler):
                 feedDict = {inputX: batchInputs, targetIxs: batchTargetIxs, targetVals: batchTargetVals,
                             targetShape: batchTargetShape, seqLengths: batchSeqLengths}
                 _, l, er, lmt = session.run([optimizer, loss, errorRate, logitsMaxTest], feed_dict=feedDict)
-                print(np.unique(
-                    lmt))  # print unique argmax values of first sample in batch; should be blank for a while, then spit out target values
-                if (batch % 1) == 0:
-                    print('Minibatch', batch, '/', batchOrigI, 'loss:', l)
-                    print('Minibatch', batch, '/', batchOrigI, 'error rate:', er)
+                #print(np.unique(
+                 #   lmt))  # print unique argmax values of first sample in batch; should be blank for a while, then spit out target values
+                #if (batch % 1) == 0:
+                 #   print('Minibatch', batch, '/', batchOrigI, 'loss:', l)
+                  #  print('Minibatch', batch, '/', batchOrigI, 'error rate:', er)
                 batchErrors[batch] = er * len(batchSeqLengths)
             epochErrorRate = batchErrors.sum() / totalN
-            print('Epoch', epoch + 1, 'error rate:', epochErrorRate)
+            #print('Epoch', epoch + 1, 'error rate:', epochErrorRate)
 
             # Save the model checkpoint periodically.
             if (epoch + 1) % steps_per_checkpoint == 0 or (epoch + 1) == nEpochs:
@@ -135,4 +138,15 @@ def generateModel(train,test,shape,rootdir,scaler):
                                                'model.ckpt')
                 saver.save(session, checkpoint_path, global_step=epoch)
 
-    return
+        #  calculate accuracy on kth fold
+        batchedData, _ = dp.data_lists_to_batches(test[0], test[1], len(test[1]), maxTimeSteps)
+        batchInputs, batchTargetSparse, batchSeqLengths = batchedData[0]
+        batchTargetIxs, batchTargetVals, batchTargetShape = batchTargetSparse
+        feedDict = {inputX: batchInputs, targetIxs: batchTargetIxs, targetVals: batchTargetVals,
+                    targetShape: batchTargetShape, seqLengths: batchSeqLengths}
+        er = session.run(errorRate, feed_dict=feedDict)
+
+        error = er * len(batchSeqLengths)
+        print('test error: ', error)
+
+    return error

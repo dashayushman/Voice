@@ -1,11 +1,11 @@
 from sklearn.cross_validation import StratifiedKFold
-from lazarus.utils import dataprep as dp
-from lazarus.utils import utility as util
+from utils import dataprep as dp
+from utils import utility as util
 from sklearn.metrics import classification_report,accuracy_score,confusion_matrix
 import os
 import time
-from lazarus.datasource import vds
-from lazarus.datasource.data import DataSet
+from datasource import vds
+from datasource.data import DataSet
 
 def evaluateAccuracy(test,data,target,models,labelsdict,labels):
     y_true = []
@@ -57,15 +57,22 @@ def evaluate(n_folds,
     fileContent = []
     accuracies = []
 
-
-    kfolds = dp.read_data_sets(rootDir,
+    kfolds,shape = vds.read_data_sets(rootDir,
                                 scaler,
-                                n_folds)
+                                n_folds,
+                                sampling_rate,
+                                reshape=True,
+                                scale=True,
+                                normalize=True,
+                                resample=True)
+
+    i = 1
+
     for i,(train, test) in enumerate(kfolds):
-         print('\n\n\n')
-         print('running evaluation of fold ' + str(i))
-         if i is 3:
-             modelGenerator.generateModel(train, test)
-             return
-         i += 1
-    #modelGenerator.generateModel(kfolds, gtarget)
+        print('\n\n\n')
+        print('running evaluation of fold ' + str(i))
+        if i is 3:
+            modelGenerator.generateModel(train,test,shape)
+            return
+        i += 1
+
