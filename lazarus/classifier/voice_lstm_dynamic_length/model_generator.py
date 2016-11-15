@@ -49,9 +49,8 @@ def generateModel(train,test):
     #ctc
     ####Define graph
     print('Defining graph')
-    #graph = tf.Graph()
-    #with graph.as_default():
-    with tf.device('/gpu:0'):
+    graph = tf.Graph()
+    with graph.as_default():
         ####NOTE: try variable-steps inputs and dynamic bidirectional rnn, when it's implemented in tensorflow
 
         global_step = tf.Variable(0, trainable=False)
@@ -112,8 +111,7 @@ def generateModel(train,test):
             os.makedirs(checkpoints_folder)
 
     ####Run session
-    with tf.Session(config=tf.ConfigProto(
-      allow_soft_placement=True, log_device_placement=True)) as session:
+    with tf.Session(graph=graph) as session:
         load_model(saver, session, checkpoints_folder)
         for epoch in range(nEpochs):
             #print('Epoch', epoch + 1, '...')
