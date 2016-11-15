@@ -149,4 +149,4 @@ def generateModel(train,test):
         error = er * len(batchSeqLengths)
         print('test error: ', error)
 
-    return error
+    return
