@@ -64,6 +64,8 @@ def evaluate(n_folds,
     for i,(train, test) in enumerate(kfolds):
          print('\n\n\n')
          print('running evaluation of fold ' + str(i))
-         modelGenerator.generateModel(train, test)
+         if i is 2:
+            modelGenerator.generateModel(train, test)
+            return
          #print('Error rate: ' + error)
     #modelGenerator.generateModel(kfolds, gtarget)
