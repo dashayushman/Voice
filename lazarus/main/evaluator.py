@@ -8,6 +8,9 @@ It consists of methods that call individual modules of different classifiers and
 from lazarus.classifier.voice_lstm_dynamic_length import evaluation as lstmDL
 from lazarus.classifier.voice_lstm_dynamic_length import model_generator as m_lstmDL
 
+from lazarus.classifier.voice_cnn_raw import evaluation as cnn
+from lazarus.classifier.voice_cnn_raw import model_generator as m_cnn
+
 #from lazarus.classifier.voice_hmm_feature import evaluation as hmmfeat
 #from lazarus.classifier.voice_hmm_feature import model_generator as m_hmmfeat
 #from lazarus.classifier.voice_hmm_raw import evaluation as hmmraw
@@ -28,7 +31,7 @@ import os
 #rd = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual\individual_ayushman'
 
 #linux
-rd = r'/home/amit/Desktop/voice/individual_ayushman'
+rd = r'/home/amit/Desktop/voice/individual_all'
 
 
 # Directory path to store the classification report
@@ -64,7 +67,20 @@ if __name__ == "__main__":
 
     print('Evaluating Various classifiers')
     print()
+    '''
+    # Evaluate CNN with raw data
+    print('Evaluating CNN with windowed features')
+    cnn.evaluate(n_folds=5,                                         # Number of folds for cross validation
+                     rootDir=rd,                                        # Root directory for ground truth
+                     reportDir=repDir,                                  # Directory to store the classification report
+                     modelGenerator=m_cnn,                          # Reference to the model generator object for creating a lstm model
+                     sampling_rate=20,                                  # new sampling rate for normalizing the data
+                     prnt=False,                                        # To print the classification Report in the console
+                     filewrt=True,                                      # To write the classification report to a file
+                     scaler = max_abs_scaler)                           # scaler used for scaling the sensor data
+    print()
 
+    '''
     # Evaluate LSTM with CTC with raw data
     print('Evaluating LSTM with CTC with windowed features')
     lstmDL.evaluate(n_folds=5,  # Number of folds for cross validation
@@ -76,8 +92,8 @@ if __name__ == "__main__":
                      filewrt=True,  # To write the classification report to a file
                      scaler=max_abs_scaler)  # scaler used for scaling the sensor data
     print()
-
     '''
+
     # Evaluate LSTM with raw data
     print('Evaluating LSTM with windowed features')
     lstmraw.evaluate(n_folds=5,                                         # Number of folds for cross validation
