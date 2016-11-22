@@ -139,14 +139,18 @@ def generateModel(train,test):
                 saver.save(session, checkpoint_path, global_step=epoch)
 
         #  calculate accuracy on kth fold
-        batchedData, _ = dp.data_lists_to_batches(test[0], test[1], len(test[1]), maxTimeSteps)
-        batchInputs, batchTargetSparse, batchSeqLengths = batchedData[0]
-        batchTargetIxs, batchTargetVals, batchTargetShape = batchTargetSparse
-        feedDict = {inputX: batchInputs, targetIxs: batchTargetIxs, targetVals: batchTargetVals,
+        testbatchedData, _ = dp.data_lists_to_batches(test[0], test[1], batchSize, maxTimeSteps)
+        batchErrors = np.zeros(len(testbatchedData))
+        batchRandIxs = np.random.permutation(len(testbatchedData))  # randomize batch order
+        for batch, batchOrigI in enumerate(batchRandIxs):
+            batchInputs, batchTargetSparse, batchSeqLengths = testbatchedData[batchOrigI]
+            batchTargetIxs, batchTargetVals, batchTargetShape = batchTargetSparse
+            feedDict = {inputX: batchInputs, targetIxs: batchTargetIxs, targetVals: batchTargetVals,
                     targetShape: batchTargetShape, seqLengths: batchSeqLengths}
-        er = session.run(errorRate, feed_dict=feedDict)
+            er = session.run(errorRate, feed_dict=feedDict)
+            batchErrors[batch] = er * len(batchSeqLengths)
 
-        error = er * len(batchSeqLengths)
-        print('test error: ', error)
+        avgError = batchErrors.sum() / len(test[1])
+        print('average test error: ', avgError)
 
     return
