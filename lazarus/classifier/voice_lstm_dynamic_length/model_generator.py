@@ -46,6 +46,9 @@ def generateModel(train,test):
     #batchedData, maxTimeSteps = dp.data_lists_to_batches(train, test, batchSize)
     totalN = len(train[1])
 
+    config = tf.ConfigProto()
+    config.gpu_options.per_process_gpu_memory_fraction = 0.1
+
     #ctc
     ####Define graph
     print('Defining graph')
@@ -110,8 +113,9 @@ def generateModel(train,test):
         if not os.path.exists(checkpoints_folder):
             os.makedirs(checkpoints_folder)
 
+
     ####Run session
-    with tf.Session(graph=graph) as session:
+    with tf.Session(graph=graph, config=config) as session:
         load_model(saver, session, checkpoints_folder)
         for epoch in range(nEpochs):
             #print('Epoch', epoch + 1, '...')
