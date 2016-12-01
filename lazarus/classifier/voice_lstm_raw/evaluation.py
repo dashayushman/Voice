@@ -55,6 +55,7 @@ def evaluate(n_folds,
         :param scaler:              (scalar object)             : To scale the sensor data
         :return:
     '''
+
     fileContent = []
     accuracies = []
 
@@ -72,7 +73,7 @@ def evaluate(n_folds,
     for i,(train, test) in enumerate(kfolds):
         print('\n\n\n')
         print('running evaluation of fold ' + str(i))
-        if i is 3:
+        if i is 1:
             modelGenerator.generateModel(train,test,shape)
             return
         i += 1

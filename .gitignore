@@ -1,0 +1,5 @@
+.idea/
+*.pkl
+resources/data/trainingdata/
+resources/images/
+*.pyc
