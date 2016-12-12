@@ -8,8 +8,8 @@ import os
 import re
 import time, datetime
 
-train_dir = "/home/mindgarage31002/projects/amit/Voice/checkpoint/cnn"
-summary_folder = "/home/mindgarage31002/projects/amit/Voice/summary/cnn"
+train_dir = "/home/amit/Desktop/voice/tf_py2.7/checkpoint/cnn"
+summary_folder = "/home/amit/Desktop/voice/tf_py2.7/summary/cnn"
 
 n_input = 10  # MNIST data input (img shape: 28*28)
 n_steps = 70  # timesteps

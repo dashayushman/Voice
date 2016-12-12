@@ -31,7 +31,7 @@ import os
 #rd = r'C:\Users\Ayushman\Google Drive\TU KAISERSLAUTERN\INFORMARTIK\PROJECT\SigVoice\Work\Training Data\individual\individual_ayushman'
 
 #linux
-rd = r'/home/amit/Desktop/voice/individual_all'
+rd = r'/home/amit/Desktop/voice/individual_ayushman'
 
 
 # Directory path to store the classification report
@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     print('Evaluating Various classifiers')
     print()
-    '''
+
     # Evaluate CNN with raw data
     print('Evaluating CNN with windowed features')
     cnn.evaluate(n_folds=5,                                         # Number of folds for cross validation
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                      filewrt=True,  # To write the classification report to a file
                      scaler=max_abs_scaler)  # scaler used for scaling the sensor data
     print()
-    '''
+
 
     # Evaluate LSTM with raw data
     print('Evaluating LSTM with windowed features')

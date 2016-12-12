@@ -718,6 +718,15 @@ def consolidateTrainingData(data,emg,imu,avg_len = 0):
     return np.array(d)
 
 def groupData(inputList,targetList,groupSize):
+    '''
+    This method groups inputList of single instance data into sequence of fixed groupSize
+    :param inputList (List): containing data values of each instance
+    :param targetList (List): list of labels corresponding to data
+    :param groupSize (int): size of the sequence groups to be formed
+    :return:    ginputList      (list), A list of sequences of data of size = groupSize
+                data        (list), A list of sequences of labels of size = groupSize
+    '''
+
     randIxs = np.random.permutation(len(inputList))
 
     gtargetList = []
@@ -795,3 +804,20 @@ def read_data_sets(rootdir,
         return kFolds
     else:
         return ginputList, gtargetList
+
+#
+def next_batch(train, batch_size, step):
+    '''
+    This method returns data from train dataset in the form of x, y batches, looping over all the batches
+    :param train: Dataset object containing instances and labels
+    :param batch_size (int): size of a batch
+    :param step (int): epoch step in training
+    :return:    labels      (list),                 A list of class labels
+                data        (list)                  A list of training instances
+    '''
+
+    no_batches = int(len(train.labels) / batch_size)
+    start = (step % no_batches) * batch_size
+    end = start + batch_size
+
+    return train.instances[start:end], train.labels[start:end]

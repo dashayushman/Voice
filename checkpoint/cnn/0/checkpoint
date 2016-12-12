@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/amit/Desktop/voice/tf_py2.7/checkpoint/cnn/0/model.ckpt-1000"
+all_model_checkpoint_paths: "/home/amit/Desktop/voice/tf_py2.7/checkpoint/cnn/0/model.ckpt-1000"
