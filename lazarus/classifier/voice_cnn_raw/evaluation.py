@@ -72,9 +72,6 @@ def evaluate(n_folds,
     for i,(train, test) in enumerate(kfolds):
         print('\n\n\n')
         print('running evaluation of fold ' + str(i))
-        if i is 3:
-            modelGenerator.train(train, shape)
-            #modelGenerator.generateModel(train,test,shape)
-            return
+        modelGenerator.train(train, test, shape, str(i))
         i += 1
 

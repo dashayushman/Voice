@@ -2,19 +2,18 @@ import tensorflow as tf
 from tensorflow.python.ops import rnn, rnn_cell
 import numpy as np
 import os
+import re
 
 from tensorflow.python.ops import ctc_ops as ctc
 from tensorflow.python.ops.rnn import bidirectional_rnn
 from lazarus.utils import dataprep as dp
 import numpy as np
 
+TOWER_NAME = 'tower'
 
-n_input = 10 # 10 mfcc features
-n_steps = 68 # timesteps
-n_hidden = 128 # hidden layer num of features
-n_classes = 10 # MNIST total classes (0-9 digits)
-checkpoints_folder = "/home/amit/Desktop/voice/tf_py2.7/checkpoint"
-steps_per_checkpoint = 100
+checkpoints_folder = "/home/amit/Desktop/voice/tf_py2.7/checkpoint/lstmwithCTC"
+summary_folder = "/home/amit/Desktop/voice/tf_py2.7/summary/lstmwithCTC"
+steps_per_checkpoint = 10
 
 def load_model(saver, sess, chkpnts_dir):
 	ckpt = tf.train.get_checkpoint_state(chkpnts_dir)
@@ -26,8 +25,51 @@ def load_model(saver, sess, chkpnts_dir):
 		print("Training with fresh parameters")
 		sess.run(tf.initialize_all_variables())
 
-def generateModel(train,test):
+def _add_loss_summaries(total_loss):
+  """Add summaries for losses in CIFAR-10 model.
+  Generates moving average for all losses and associated summaries for
+  visualizing the performance of the network.
+  Args:
+    total_loss: Total loss from loss().
+  Returns:
+    loss_averages_op: op for generating moving averages of losses.
+  """
+  # Compute the moving average of all individual losses and the total loss.
+  loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
+  losses = tf.get_collection('losses')
+  loss_averages_op = loss_averages.apply(losses + [total_loss])
 
+  # Attach a scalar summary to all individual losses and the total loss; do the
+  # same for the averaged version of the losses.
+  for l in losses + [total_loss]:
+    # Name each loss as '(raw)' and name the moving average version of the loss
+    # as the original loss name.
+    tf.scalar_summary(l.op.name +' (raw)', l)
+    tf.scalar_summary(l.op.name, loss_averages.average(l))
+
+  return loss_averages_op
+
+def _activation_summary(x):
+	"""Helper to create summaries for activations.
+	Creates a summary that provides a histogram of activations.
+	Creates a summary that measures the sparsity of activations.
+	Args:
+	  x: Tensor
+	Returns:
+	  nothing
+	"""
+	# Remove 'tower_[0-9]/' from the name in case this is a multi-GPU training
+	# session. This helps the clarity of presentation on tensorboard.
+	tensor_name = re.sub('%s_[0-9]*/' % TOWER_NAME, '', x.op.name)
+	tf.histogram_summary(tensor_name + '/activations', x)
+	tf.scalar_summary(tensor_name + '/sparsity', tf.nn.zero_fraction(x))
+
+
+def generateModel(train, test, fold):
+    global checkpoints_folder
+    global summary_folder
+    checkpoints_folder += os.sep + fold
+    summary_folder += os.sep + fold
     # learning Parameters
     learningRate = 0.001
     nEpochs = 10
@@ -36,7 +78,7 @@ def generateModel(train,test):
 
     # Network Parameters
     nFeatures = 10  # IMU = acc, gyr, ori raw features
-    nHidden = 128
+    nHidden = 128   # hidden layer num of features
     nClasses = 11  # n_classes, plus the "blank" for CTC
 
 
@@ -47,7 +89,7 @@ def generateModel(train,test):
     totalN = len(train[1])
 
     config = tf.ConfigProto()
-    config.gpu_options.per_process_gpu_memory_fraction = 0.1
+    config.gpu_options.per_process_gpu_memory_fraction = 0.5 # limit on gpu usage
 
     #ctc
     ####Define graph
@@ -83,9 +125,12 @@ def generateModel(train,test):
 
         ####Network
         forwardH1 = rnn_cell.LSTMCell(nHidden, use_peepholes=True, state_is_tuple=True)
+
         backwardH1 = rnn_cell.LSTMCell(nHidden, use_peepholes=True, state_is_tuple=True)
+
         fbH1, _, _ = bidirectional_rnn(forwardH1, backwardH1, inputList, dtype=tf.float32,
                                        scope='BDLSTM_H1')
+
         fbH1rs = [tf.reshape(t, [batchSize, 2, nHidden]) for t in fbH1]
         outH1 = [tf.reduce_sum(tf.mul(t, weightsOutH1), reduction_indices=1) + biasesOutH1 for t in fbH1rs]
 
@@ -93,6 +138,7 @@ def generateModel(train,test):
 
         ####Optimizing
         logits3d = tf.pack(logits)
+        _activation_summary(logits3d)
         loss = tf.reduce_mean(ctc.ctc_loss(logits3d, targetY, seqLengths))
         optimizer = tf.train.MomentumOptimizer(learningRate, momentum).minimize(loss)
 
@@ -116,6 +162,8 @@ def generateModel(train,test):
 
     ####Run session
     with tf.Session(graph=graph, config=config) as session:
+        summary_op = tf.merge_all_summaries()
+        summary_writer = tf.train.SummaryWriter(summary_folder, graph)
         load_model(saver, session, checkpoints_folder)
         for epoch in range(nEpochs):
             #print('Epoch', epoch + 1, '...')
@@ -137,6 +185,10 @@ def generateModel(train,test):
             #print('Epoch', epoch + 1, 'error rate:', epochErrorRate)
 
             # Save the model checkpoint periodically.
+            if (epoch + 1) % steps_per_checkpoint == 0 or (epoch + 1) == nEpochs:
+                 summary_str = session.run(summary_op, feed_dict=feedDict)
+                 summary_writer.add_summary(summary_str, epoch+1)
+
             if (epoch + 1) % steps_per_checkpoint == 0 or (epoch + 1) == nEpochs:
                 checkpoint_path = os.path.join(checkpoints_folder,
                                                'model.ckpt')
