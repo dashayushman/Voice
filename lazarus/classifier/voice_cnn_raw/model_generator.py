@@ -8,8 +8,8 @@ import os
 import re
 import time, datetime
 
-train_dir = "/home/amit/Desktop/voice/tf_py2.7/checkpoint/cnn"
-summary_folder = "/home/amit/Desktop/voice/tf_py2.7/summary/cnn"
+train_dir = "/home/mindgarage31002/projects/amit/Voice/checkpoint/cnn"
+summary_folder = "/home/mindgarage31002/projects/amit/Voice/summary/cnn"
 
 n_input = 10  # MNIST data input (img shape: 28*28)
 n_steps = 70  # timesteps
@@ -19,14 +19,14 @@ batch_size = 20
 
 TOWER_NAME = 'tower'
 
-training_iters = 2000
-max_steps = 100
+training_iters = 200000
+max_steps = 10000
 # Constants describing the training process.
 MOVING_AVERAGE_DECAY = 0.9999  # The decay to use for the moving average.
 LEARNING_RATE_DECAY_FACTOR = 0.1  # Learning rate decay factor.
 INITIAL_LEARNING_RATE = 0.1  # Initial learning rate.
-NUM_EPOCHS_PER_DECAY = 350.0  # Epochs after which learning rate decays.
-steps_per_checkpoint = 10
+NUM_EPOCHS_PER_DECAY = 100.0  # Epochs after which learning rate decays.
+steps_per_checkpoint = 1000
 
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 160
 
@@ -143,12 +143,23 @@ def BatchNorm(inputT, is_training, scope=None):
 
 
 def gen_conv_layer(prev, name, kernel, stride, is_training, filter_img=False):
+    """
+    generates conv layer for 1d input e.g. signal
+    Args:
+      prev 3D Tensor: previous layer tensor
+      name string: name to be given to the layer
+      kernel: [filter_length, input_channels, output_channels]
+      stride integer: number of entries by which the filter is moved right 
+      is_training bool: controls training or test version of batch normalization
+    Returns:
+      1d conv layer
+    """
     with tf.variable_scope(name) as scope:
         kernel_conv = _variable_with_weight_decay('weights',
                                                   shape=kernel,
                                                   stddev=5e-2,
                                                   wd=0.0)
-        conv = tf.nn.conv1d(prev, kernel_conv, stride, padding='SAME')
+        conv = tf.nn.conv1d(prev, kernel_conv, stride, padding='SAME') 
         biases = _variable_on_cpu('biases', [kernel[-1]],
                                   tf.constant_initializer(0.0))
         bias = tf.nn.bias_add(conv, biases)
@@ -162,6 +173,17 @@ def gen_conv_layer(prev, name, kernel, stride, is_training, filter_img=False):
 
 
 def gen_pool_layer(prev, name, ksize, strides, padding='SAME'):
+    """
+    generates max_pool layer
+    Args:
+      prev : A 4-D Tensor with shape [batch, height, width, channels]
+      name string: name to be given to the layer
+      ksize: The size of the window for each dimension of the input tensor
+      strides: The stride of the sliding window for each dimension of the input tensor
+      padding: The padding algorithm
+    Returns:
+      max_pool layer
+    """
     pool = tf.nn.max_pool(prev, ksize=ksize, strides=strides, padding=padding,
                           name=name)
     _activation_summary(pool)
@@ -201,7 +223,7 @@ def get_softmax_layer(prev, name, size):
 
 
 def gen_model_1(gestures, is_training):
-    conv1 = gen_conv_layer(gestures, 'conv1', [6, 10, 100], 4, is_training,
+    conv1 = gen_conv_layer(gestures, 'conv1', [6, 10, 100], 2, is_training,
                            filter_img=True)
     norm1 = gen_norm_layer([conv1], 'norm1')
     pool1 = gen_pool_layer(norm1, 'pool1', [1, 1, 3, 1], [1, 1, 2, 1],
@@ -222,11 +244,11 @@ def gen_model_1(gestures, is_training):
 
     # pool3 = gen_pool_layer(conv5, 'pool3', [1, 3, 3, 1], [1, 2, 2, 1],
     #                      padding='VALID')
-    fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 100], do_reshape=True)
+    fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 1000], do_reshape=True)
     # fcn2 = gen_fully_connected_layer(fcn1, 'fc2', [4096, 4096], do_reshape=False)
     # fcn3 = gen_fully_connected_layer(fcn2, 'fc3', [4096, 1000], do_reshape=False)
 
-    smx = get_softmax_layer(fcn1, 'softmax', [100, 10])
+    smx = get_softmax_layer(fcn1, 'softmax', [1000, 10])
     return smx
 
 
@@ -435,7 +457,7 @@ def train(train, test, shape, fold):
         # Create a saver.
         saver = tf.train.Saver(tf.all_variables())
         config = tf.ConfigProto(log_device_placement=True)
-        config.gpu_options.per_process_gpu_memory_fraction = 0.5 # limit on gpu usage
+        config.gpu_options.per_process_gpu_memory_fraction = 0.3 # limit on gpu usage
 
         checkpoints_folder = train_dir
         sess = tf.Session(config=config)
