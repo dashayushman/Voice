@@ -20,7 +20,8 @@ def read_data_sets(rootDir,
                     reshape=True,
                     scale=True,
                     normalize=True,
-                    resample=True):
+                    resample=True,
+                    discritizeLabels = True):
 
     # extract training data from the root directory of the ground truth
     labels, \
@@ -58,7 +59,8 @@ def read_data_sets(rootDir,
 
     skf = StratifiedKFold(target, n_folds)
 
-    target = dp.discritizeLabels(target)
+    if(discritizeLabels):
+        target = dp.discritizeLabels(target)
     data = dp.prepareDataset(data)
     if n_folds > 0:
         kFolds = []
