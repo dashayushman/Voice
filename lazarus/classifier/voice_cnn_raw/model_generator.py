@@ -171,6 +171,22 @@ def gen_conv_layer(prev, name, kernel, stride, is_training, filter_img=False):
 
     return conv
 
+def gen_avgpool_layer(prev, name, ksize, strides, padding='SAME'):
+    """
+    generates max_pool layer
+    Args:
+      prev : A 4-D Tensor with shape [batch, height, width, channels]
+      name string: name to be given to the layer
+      ksize: The size of the window for each dimension of the input tensor
+      strides: The stride of the sliding window for each dimension of the input tensor
+      padding: The padding algorithm
+    Returns:
+      max_pool layer
+    """
+    pool = tf.nn.avg_pool(prev, ksize=ksize, strides=strides, padding=padding,
+                          name=name)
+    _activation_summary(pool)
+    return pool
 
 def gen_pool_layer(prev, name, ksize, strides, padding='SAME'):
     """
@@ -222,18 +238,23 @@ def get_softmax_layer(prev, name, size):
     return softmax_linear
 
 def gen_model_2(gestures, is_training):
-    conv1 = gen_conv_layer(gestures, 'conv1', [5, 10, 128], 2, is_training,
-                           filter_img=True)
-    pool1 = gen_pool_layer([conv1], 'pool1', [1, 1, 3, 3], [1, 1, 2, 1],
+    conv1 = gen_conv_layer(gestures, 'conv1', [3, 10, 128], 2, is_training,
+                           filter_img=True) # gestures = (20,70,10)
+    pool1 = gen_pool_layer([conv1], 'pool1', [1, 1, 3, 1], [1, 1, 2, 1],
                            padding='VALID') # kernel combining 3 channels
     pool1 = tf.squeeze(pool1, [0])
+    conv2 = gen_conv_layer(pool1, 'conv2', [3, 128, 512], 2, is_training,
+                           filter_img=True)
 
+    avgpool1 = gen_avgpool_layer([conv2],'avgpool1',[1,1,9,1],[1, 1, 1, 1],
+                           padding='VALID')
+    avgpool1 = tf.squeeze(avgpool1)
     # need to apply average pool to reduce the number of parameters
-    fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 1024], do_reshape=True)
+    #fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 1024], do_reshape=True)
 
     # apply dropout layer
 
-    smx = get_softmax_layer(fcn1, 'softmax', [1024, 10])
+    smx = get_softmax_layer(avgpool1, 'softmax', [512, 10])
     return smx
 
 def gen_model_1(gestures, is_training):
@@ -471,7 +492,8 @@ def train(train, test, shape, fold):
         y = tf.placeholder("float", [batch_size])
         is_training = tf.placeholder(tf.bool)
 
-        logits = gen_model_1(x, is_training)
+        #logits = gen_model_1(x, is_training)
+        logits = gen_model_2(x, is_training)
 
         loss = lossfnc(logits, y)
         train_op = trainfnc(loss, global_step)
