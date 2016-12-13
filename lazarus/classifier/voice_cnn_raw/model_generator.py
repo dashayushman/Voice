@@ -221,14 +221,36 @@ def get_softmax_layer(prev, name, size):
 
     return softmax_linear
 
+def gen_model_2(gestures, is_training):
+    conv1 = gen_conv_layer(gestures, 'conv1', [5, 10, 128], 2, is_training,
+                           filter_img=True)
+    pool1 = gen_pool_layer([conv1], 'pool1', [1, 1, 3, 3], [1, 1, 2, 1],
+                           padding='VALID') # kernel combining 3 channels
+    pool1 = tf.squeeze(pool1, [0])
+
+    # need to apply average pool to reduce the number of parameters
+    fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 1024], do_reshape=True)
+
+    # apply dropout layer
+
+    smx = get_softmax_layer(fcn1, 'softmax', [1024, 10])
+    return smx
 
 def gen_model_1(gestures, is_training):
-    conv1 = gen_conv_layer(gestures, 'conv1', [6, 10, 100], 2, is_training,
+    # something on the lines of alexnet
+    conv1 = gen_conv_layer(gestures, 'conv1', [5, 10, 128], 2, is_training,
                            filter_img=True)
-    norm1 = gen_norm_layer([conv1], 'norm1')
-    pool1 = gen_pool_layer(norm1, 'pool1', [1, 1, 3, 1], [1, 1, 2, 1],
+    #norm1 = gen_norm_layer([conv1], 'norm1') # check without norm
+    pool1 = gen_pool_layer([conv1], 'pool1', [1, 1, 3, 1], [1, 1, 2, 1],
                            padding='VALID')  # used the same ideology of conv1d to conv2d, need to confirm
     pool1 = tf.squeeze(pool1, [0])
+
+    fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 1024], do_reshape=True)
+
+    # VGG like 3 * 3 conv stride 1, pad 1 and 2*2 MAX POOL stride 2
+    # rather than using fully connected use avg pool across the complete image, works almost as well
+    # google net inception module
+    # resnet xavier/2, batch norm, l.r. 0.1, weight decay 1e-5, no dropout
 
     # conv2 = gen_conv_layer(pool1, 'conv2', [6, 100, 256], 4)
     # norm2 = gen_norm_layer([conv2], 'norm2')
@@ -244,11 +266,11 @@ def gen_model_1(gestures, is_training):
 
     # pool3 = gen_pool_layer(conv5, 'pool3', [1, 3, 3, 1], [1, 2, 2, 1],
     #                      padding='VALID')
-    fcn1 = gen_fully_connected_layer(pool1, 'fc1', [None, 1000], do_reshape=True)
+
     # fcn2 = gen_fully_connected_layer(fcn1, 'fc2', [4096, 4096], do_reshape=False)
     # fcn3 = gen_fully_connected_layer(fcn2, 'fc3', [4096, 1000], do_reshape=False)
 
-    smx = get_softmax_layer(fcn1, 'softmax', [1000, 10])
+    smx = get_softmax_layer(fcn1, 'softmax', [1024, 10])
     return smx
 
 
@@ -475,6 +497,9 @@ def train(train, test, shape, fold):
             batch_x, batch_y = dp.next_batch(train, batch_size, step)
 
             batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+
+
+
             _, loss_value = sess.run([train_op, loss], feed_dict={x: batch_x, y: batch_y, is_training: True})
 
             duration = time.time() - start_time
@@ -506,6 +531,29 @@ def train(train, test, shape, fold):
 
             step += 1
 
+        # evaluation on training data
+        train_size = len(test.labels)
+        avg_acc = 0.0
+        step = 1
+        while step * batch_size < train_size:
+            batch_x, batch_y = dp.next_batch(train, batch_size, step)
+
+            batch_x = batch_x.reshape((batch_size, n_steps, n_input))
+
+            images_eval, labels_eval = batch_x, batch_y
+
+            one_hot_eval_labels = convert_labels_to_one_hot(labels_eval)
+
+            acc = gen_accuracy(one_hot_eval_labels, logits)
+
+            acc_val = sess.run([acc], feed_dict={x: batch_x, y: batch_y, is_training: False})
+            avg_acc += acc_val[0]
+
+            step += 1
+        print('Training Average Accuracy fold' + fold + ': ' + str(avg_acc / step))
+
+
+
         # evaluation on test data
         testing_iters = len(test.labels)
 
@@ -528,4 +576,4 @@ def train(train, test, shape, fold):
             avg_acc += acc_val[0]
 
             step += 1
-        print('Average Accuracy fold' + fold + ': ' + str(avg_acc / step))
+        print('Test Average Accuracy fold' + fold + ': ' + str(avg_acc / step))
