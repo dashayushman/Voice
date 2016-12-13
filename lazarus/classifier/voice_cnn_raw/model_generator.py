@@ -246,7 +246,7 @@ def gen_model_2(gestures, is_training):
     conv2 = gen_conv_layer(pool1, 'conv2', [3, 128, 512], 2, is_training,
                            filter_img=True)
 
-    avgpool1 = gen_avgpool_layer([conv2],'avgpool1',[1,1,9,1],[1, 1, 1, 1],
+    avgpool1 = gen_avgpool_layer([conv2],'avgpool1',[1,1,conv2.get_shape()[1].value,1],[1, 1, 1, 1],
                            padding='VALID')
     avgpool1 = tf.squeeze(avgpool1)
     # need to apply average pool to reduce the number of parameters
