@@ -61,13 +61,17 @@ def evaluate(n_folds,
     kfolds = dp.read_data_sets(rootDir,
                                 scaler,
                                 n_folds)
-    file = open("expresultFile.txt", 'a')
+
     for i,(train, test) in enumerate(kfolds):
+         file = open("expresultFile.txt", 'a')
          file.write('\n\n\n')
          file.write('running evaluation of fold ' + str(i))
          trainerror, testerror = modelGenerator.generateModel(train, test,str(i))
          file.write('average test error: ' + str(testerror) + '\n')
          file.write('average test error: ' + str(trainerror) + '\n')
+         file.flush()
+         os.fsync(file.fileno())
+         file.close()
+
          #print('Error rate: ' + error)
     #modelGenerator.generateModel(kfolds, gtarget)
-    file.close()

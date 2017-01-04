@@ -13,8 +13,8 @@ TOWER_NAME = 'tower'
 
 checkpoints_folder = "/home/amit/Desktop/voice/tf_py2.7/checkpoint/lstmwithCTC"
 summary_folder = "/home/amit/Desktop/voice/tf_py2.7/summary/lstmwithCTC"
-steps_per_checkpoint = 10
-iterations_per_summary = 80
+steps_per_checkpoint = 100
+iterations_per_summary = 10
 
 def load_model(saver, sess, chkpnts_dir):
 	ckpt = tf.train.get_checkpoint_state(chkpnts_dir)
@@ -75,7 +75,7 @@ def generateModel(train, test, fold):
     summary_folder += os.sep + fold
     # learning Parameters
     learningRate = 0.001
-    nEpochs = 10
+    nEpochs = 1000
     batchSize = 10
     momentum = 0.9 #for faster convergence and reduced oscillation in gradient descent
 

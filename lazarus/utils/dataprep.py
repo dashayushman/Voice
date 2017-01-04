@@ -783,7 +783,7 @@ def read_data_sets(rootdir,
            total number of samples (int)'''
     _, inputList, targetList, _, _, _, _, _, _, _, _, _ = getTrainingDataDrnn(rootdir, scaler)
 
-    ginputList, gtargetList = groupData(inputList, targetList, groupSize=4)
+    ginputList, gtargetList = groupData(inputList, targetList, groupSize=1)
 
     skf = KFold(n_folds)
     if n_folds > 0:
