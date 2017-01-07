@@ -49,6 +49,60 @@ def read_json_file(filepath):
 
 # Get training data from the root directory where the ground truth exists
 
+#using spline interpolation
+def createSyntheticTrainingData(rootdir):
+    training_class_dirs = os.walk(rootdir)
+    labels = []
+    labeldirs = []
+    target = []
+    data = []
+    skip = True
+    for trclass in training_class_dirs:
+        #print(trclass)
+        if skip is True:
+            labels = trclass[1]
+            skip = False
+            continue
+        labeldirs.append((trclass[0],trclass[2]))
+
+    for i,labeldir in enumerate(labeldirs):
+        dirPath = labeldir[0]
+        filelist = labeldir[1]
+        if not bool(filelist):
+            continue
+        for file in filelist:
+            fileData = read_json_file(dirPath + os.path.sep +file)
+
+            #extract data from the dictionary
+
+            #emg
+            emg = fe.max_abs_scaler.fit_transform(np.array(fileData['emg']['data']))
+            emgts = np.array(fileData['emg']['timestamps'])
+
+            #accelerometer
+            acc = fe.max_abs_scaler.fit_transform(np.array(fileData['acc']['data']))
+            accts = np.array(fileData['acc']['timestamps'])
+
+            # gyroscope
+            gyr = fe.max_abs_scaler.fit_transform(np.array(fileData['gyr']['data']))
+            gyrts = np.array(fileData['gyr']['timestamps'])
+
+            # orientation
+            ori = fe.max_abs_scaler.fit_transform(np.array(fileData['ori']['data']))
+            orits = np.array(fileData['ori']['timestamps'])
+
+            #create training instance
+            #ti = tri.TrainingInstance(labels[i],emg,acc,gyr,ori,emgts,accts,gyrts,orits)
+
+            #append training instance to data list
+            #data.append(ti)
+
+            #append class label to target list
+            #target.append(labels[i])
+
+    return labels,data,target
+
+
 def getTrainingData(rootdir):
     '''
     This method gets all the training data from the root directory of the ground truth
@@ -750,14 +804,14 @@ def groupData(inputList,targetList,groupSize):
     return ginputList, gtargetList
 
 
-def load_batched_data(rootdir, batchSize, scaler):
-    '''returns 3-element tuple: batched data (list), max # of time steps (int), and
-       total number of samples (int)'''
-    _, inputList, targetList, _, _, _, _, _, _, _, _, _ = getTrainingDataDrnn(rootdir,scaler)
-
-    ginputList, gtargetList = groupData(inputList,targetList,groupSize=4)
-
-    return data_lists_to_batches(ginputList, gtargetList, batchSize) + (len(gtargetList),)
+# def load_batched_data(rootdir, batchSize, scaler):
+#     '''returns 3-element tuple: batched data (list), max # of time steps (int), and
+#        total number of samples (int)'''
+#     _, inputList, targetList, _, _, _, _, _, _, _, _, _ = getTrainingDataDrnn(rootdir,scaler)
+#
+#     ginputList, gtargetList = groupData(inputList,targetList,groupSize=1)
+#
+#     return data_lists_to_batches(ginputList, gtargetList, batchSize) + (len(gtargetList),)
 
 def splitDynSizeDataset(train,test,target,data):
     train_x = []
@@ -783,7 +837,7 @@ def read_data_sets(rootdir,
            total number of samples (int)'''
     _, inputList, targetList, _, _, _, _, _, _, _, _, _ = getTrainingDataDrnn(rootdir, scaler)
 
-    ginputList, gtargetList = groupData(inputList, targetList, groupSize=1)
+    ginputList, gtargetList = groupData(inputList, targetList, groupSize=5)
 
     skf = KFold(n_folds)
     if n_folds > 0:
