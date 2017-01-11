@@ -58,11 +58,7 @@ def createSyntheticTrainingData(rootdir):
     # emg1 = [1,2,3,4]
     # emg2 = [3,4,5,6,7]
     # # first signal
-    # x1 = np.asarray(range(0,len(emg1)))
-    # # normalize x1
-    # x1 = x1/(len(x1) -1)
-    # y1 = emg1
-    # f1 = interp1d(x1, y1, kind='cubic', axis=0)
+    # pad
     #
     # # second signal
     # x2 = np.asarray(range(0,len(emg2)))
@@ -634,8 +630,19 @@ def data_lists_to_batches(inputList, targetList, batchSize, trainMaxSteps = 0):
         batchTargetList = []
         for batchI, origI in enumerate(randIxs[start:end]):
             padSecs = maxSteps - inputList[origI].shape[1]
-            batchInputs[:, batchI, :] = np.pad(inputList[origI].T, ((0, padSecs), (0, 0)),
+            if(padSecs >= 0):
+                batchInputs[:, batchI, :] = np.pad(inputList[origI].T, ((0, padSecs), (0, 0)),
                                                'constant', constant_values=0)
+            else:
+                x1 = np.asarray(range(0, inputList[origI].shape[1]))
+                # normalize x1
+                x1 = x1/(len(x1) -1)
+                y1 = inputList[origI].T
+                f1 = interp1d(x1, y1, kind='cubic', axis=0)
+
+                m = np.asarray(range(0, maxSteps))
+                m = m/(len(m)-1)
+                batchInputs[:, batchI, :] = f1(m)
             batchTargetList.append(targetList[origI])
         dataBatches.append((batchInputs, target_list_to_sparse_tensor(batchTargetList),
                             batchSeqLengths))
@@ -899,8 +906,8 @@ def read_data_sets(rootdir,
 
     ginputList, gtargetList = groupData(inputList, targetList, groupSize=5)
 
-    skf = KFold(n_folds)
     if n_folds > 0:
+        skf = KFold(n_folds)
         kFolds = []
         # for train, test in skf:
         #     print('split train and validation data')
