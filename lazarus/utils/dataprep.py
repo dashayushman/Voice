@@ -7,6 +7,8 @@ from lazarus.utils import feature_extractor as fe
 import pickle
 import random
 from sklearn.model_selection import KFold
+from scipy.interpolate import interp1d
+
 #from sklearn.cross_validation import StratifiedKFold
 
 def scaleData(data,scaler):
@@ -51,56 +53,114 @@ def read_json_file(filepath):
 
 #using spline interpolation
 def createSyntheticTrainingData(rootdir):
+    # algorithm to spline interpolate
+    # tesing
+    # emg1 = [1,2,3,4]
+    # emg2 = [3,4,5,6,7]
+    # # first signal
+    # x1 = np.asarray(range(0,len(emg1)))
+    # # normalize x1
+    # x1 = x1/(len(x1) -1)
+    # y1 = emg1
+    # f1 = interp1d(x1, y1, kind='cubic', axis=0)
+    #
+    # # second signal
+    # x2 = np.asarray(range(0,len(emg2)))
+    # # normalize x2
+    # x2 = x2/(len(x2)-1)
+    # y2 = emg2
+    # f2 = interp1d(x2, y2, kind='cubic', axis=0)
+    #
+    # # new signal
+    # mlen = int((len(emg1) + len(emg2)) / 2)
+    # m = np.asarray(range(0,mlen))
+    # m = m/(len(m)-1)
+    # nemg1 = f1(m)
+    # nemg2 = f2(m)
+    # nemg = (nemg1 + nemg2)/2
+
     training_class_dirs = os.walk(rootdir)
-    labels = []
     labeldirs = []
-    target = []
-    data = []
     skip = True
+
     for trclass in training_class_dirs:
         #print(trclass)
         if skip is True:
-            labels = trclass[1]
             skip = False
             continue
         labeldirs.append((trclass[0],trclass[2]))
 
+
     for i,labeldir in enumerate(labeldirs):
+        saveDirPath = ""
         dirPath = labeldir[0]
         filelist = labeldir[1]
         if not bool(filelist):
+            # extract synthetic data save location
+            saveDirPath = dirPath
             continue
-        for file in filelist:
-            fileData = read_json_file(dirPath + os.path.sep +file)
 
-            #extract data from the dictionary
+        # synthetic data for the same person, e.g. signal8_1 and signal8_2 are combined
+        for file1 in filelist:
+            f1 = []
+            y1len = []
 
-            #emg
-            emg = fe.max_abs_scaler.fit_transform(np.array(fileData['emg']['data']))
-            emgts = np.array(fileData['emg']['timestamps'])
+            fileData1 = read_json_file(dirPath + os.path.sep + file1)
 
-            #accelerometer
-            acc = fe.max_abs_scaler.fit_transform(np.array(fileData['acc']['data']))
-            accts = np.array(fileData['acc']['timestamps'])
+            for index, y1 in enumerate([fileData1['emg']['data'], fileData1['acc']['data'],
+                                        fileData1['gyr']['data'],
+                                        fileData1['ori']['data']]):
+                x1 = np.asarray(range(0, len(y1)))
+                x1 = x1 / (len(x1) - 1)
+                f1.append(interp1d(x1, y1, kind='cubic', axis=0))
+                y1len.append(len(y1))
 
-            # gyroscope
-            gyr = fe.max_abs_scaler.fit_transform(np.array(fileData['gyr']['data']))
-            gyrts = np.array(fileData['gyr']['timestamps'])
+            for file2 in filelist:
+                if file1 >= file2:
+                    continue
 
-            # orientation
-            ori = fe.max_abs_scaler.fit_transform(np.array(fileData['ori']['data']))
-            orits = np.array(fileData['ori']['timestamps'])
+                fileData2 = read_json_file(dirPath + os.path.sep + file2)
+                newfiledata = []
+                newSignaldata = []
+                for index, y2 in enumerate(
+                        [fileData2['emg']['data'], fileData2['acc']['data'], fileData2['gyr']['data'],
+                         fileData2['ori']['data']]):
+                    x2 = np.asarray(range(0, len(y2)))
+                    x2 = x2 / (len(x2) - 1)
+                    f2 = interp1d(x2, y2, kind='cubic', axis=0)
 
-            #create training instance
-            #ti = tri.TrainingInstance(labels[i],emg,acc,gyr,ori,emgts,accts,gyrts,orits)
+                    mlen = int((y1len[index] + len(y2)) / 2)
+                    m = np.asarray(range(0,mlen))
+                    m = m/(len(m)-1)
+                    nsignal1 = f1[index](m)
+                    nsignal2 = f2(m)
+                    newSignaldata.append((np.array((nsignal1 + nsignal2)/2)).tolist())
+                newfiledata = {'emg':{'timestamps':fileData2['emg']['timestamps'], 'data':newSignaldata[0]}, 'acc':{'timestamps':fileData2['acc']['timestamps'], 'data' : newSignaldata[1]}, 'gyr':{'timestamps':fileData2['gyr']['timestamps'], 'data':newSignaldata[2]}, 'ori':{'timestamps':fileData2['ori']['timestamps'], 'data':newSignaldata[3]} }
 
-            #append training instance to data list
-            #data.append(ti)
+                # new file name
+                fsplit1 = file1.split("_")
+                fsplit2 = file2.split("_")
+                newfile = fsplit1[0] + "_" + fsplit1[1] + fsplit2[1] + "_" + fsplit2[2]
+                newfileloc = dirPath + os.path.sep + newfile
 
-            #append class label to target list
-            #target.append(labels[i])
+                with open(newfileloc, 'w') as f:
+                    json.dump(newfiledata, f)
 
-    return labels,data,target
+
+        # create synthetic data using signals from two different persons
+        # use filelist and jfilelist in above code to combine signals
+        #
+        # for j, jlabeldir in enumerate(labeldirs):
+        #     jdirPath = jlabeldir[0]
+        #     jfilelist = jlabeldir[1]
+        #     if not bool(jfilelist):
+        #         continue
+        #
+        #     if jdirPath == dirPath: # same person same data
+        #         continue
+        #
+        #     for jfile in jfilelist:
+        #         jfileData = read_json_file(jdirPath + os.path.sep + jfile)
 
 
 def getTrainingData(rootdir):
